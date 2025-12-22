@@ -1,0 +1,37 @@
+{
+    "name": "bitcoin-dex-contracts",
+    "version": "1.0.0",
+    "description": "Uniswap V2 contracts deployed on MIDL (Bitcoin)",
+    "scripts": {
+        "compile": "hardhat compile",
+        "deploy": "hardhat deploy --network default",
+        "deploy:regtest": "hardhat deploy --network default",
+        "verify": "hardhat verify",
+        "test": "hardhat test",
+        "clean": "hardhat clean",
+        "address": "hardhat midl:address"
+    },
+    "devDependencies": {
+        "@midl/executor": "latest",
+        "@midl/hardhat-deploy": "latest",
+        "@nomicfoundation/hardhat-ethers": "^4.0.3",
+        "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+        "@nomicfoundation/hardhat-verify": "^2.0.0",
+        "@typechain/ethers-v6": "^0.5.1",
+        "@typechain/hardhat": "^9.1.0",
+        "@types/node": "^20.10.0",
+        "ethers": "^6.16.0",
+        "hardhat": "^2.19.0",
+        "hardhat-deploy": "^0.12.0",
+        "ts-node": "^10.9.0",
+        "typechain": "^8.3.2",
+        "typescript": "^5.3.0"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.9.3",
+        "@uniswap/lib": "4.0.1-alpha",
+        "@uniswap/v2-core": "^1.0.1",
+        "@uniswap/v2-periphery": "^1.1.0-beta.0",
+        "dotenv": "^17.2.3"
+    }
+}
