@@ -1,103 +1,88 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import { CONTRACTS, ERC20_ABI } from "../config/contracts";
+import { CONTRACTS, ERC20_ABI, ROUTER_ABI } from "../config/contracts";
 import { parseUnits } from "ethers";
-import { useReadContracts, useAccounts, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-
-interface Token {
-    symbol: string;
-    address: string;
-    decimals: number;
-    name: string;
-}
+import { useAccounts } from "@midl/react";
+import { useReadContracts, useWriteContract } from "wagmi";
 
 export default function LiquidityInterface() {
-    const [tokenA] = useState<Token>(CONTRACTS.WBTC);
-    const [tokenB] = useState<Token>(CONTRACTS.TBTC);
     const [amountA, setAmountA] = useState("");
     const [amountB, setAmountB] = useState("");
-    const [step, setStep] = useState<'idle' | 'approve1' | 'approve2' | 'add'>('idle');
+    const [status, setStatus] = useState("");
 
-    const { addresses } = useAccounts();
-    const userAddress = addresses?.[0];
+    const { accounts, isConnected } = useAccounts();
+    const userAddress = accounts?.[0]?.address as `0x${string}` | undefined;
 
-    const { writeContract, data: hash, isPending } = useWriteContract();
-    const { isSuccess } = useWaitForTransactionReceipt({ hash });
+    const { writeContract, isPending } = useWriteContract();
 
     // Read token balances
     const { data: balances } = useReadContracts({
         contracts: [
             {
-                address: tokenA.address as `0x${string}`,
+                address: CONTRACTS.TBTC.address as `0x${string}`,
                 abi: ERC20_ABI,
                 functionName: "balanceOf",
                 args: userAddress ? [userAddress] : undefined,
             },
             {
-                address: tokenB.address as `0x${string}`,
+                address: CONTRACTS.TUSDC.address as `0x${string}`,
                 abi: ERC20_ABI,
                 functionName: "balanceOf",
                 args: userAddress ? [userAddress] : undefined,
             },
         ],
-        query: {
-            enabled: Boolean(userAddress),
-        },
+        query: { enabled: Boolean(userAddress) },
     });
 
-    const handleAddLiquidity = async () => {
-        if (!userAddress || !amountA || !amountB) return;
-
-        try {
-            const amountADesired = parseUnits(amountA, tokenA.decimals);
-
-            // Step 1: Approve tokenA
-            setStep('approve1');
-            writeContract({
-                address: tokenA.address as `0x${string}`,
-                abi: ERC20_ABI,
-                functionName: "approve",
-                args: [CONTRACTS.Router.address, amountADesired],
-            });
-        } catch (error) {
-            console.error("Error:", error);
-            alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-            setStep('idle');
-        }
-    };
-
-    // Handle approval success
-    if (isSuccess && step === 'approve1') {
-        const amountBDesired = parseUnits(amountB, tokenB.decimals);
-        setStep('approve2');
-
-        writeContract({
-            address: tokenB.address as `0x${string}`,
-            abi: ERC20_ABI,
-            functionName: "approve",
-            args: [CONTRACTS.Router.address, amountBDesired],
-        });
-    }
-
     const balanceA = balances?.[0]?.result
-        ? Number(balances[0].result as bigint) / 10 ** tokenA.decimals
+        ? Number(balances[0].result as bigint) / 10 ** CONTRACTS.TBTC.decimals
         : 0;
     const balanceB = balances?.[1]?.result
-        ? Number(balances[1].result as bigint) / 10 ** tokenB.decimals
+        ? Number(balances[1].result as bigint) / 10 ** CONTRACTS.TUSDC.decimals
         : 0;
 
-    const getButtonText = () => {
-        if (!userAddress) return "Connect Wallet";
-        if (isPending) {
-            if (step === 'approve1') return "Approving WBTC...";
-            if (step === 'approve2') return "Approving TBTC...";
-            if (step === 'add') return "Adding Liquidity...";
-            return "Processing...";
-        }
-        if (!amountA || !amountB || parseFloat(amountA) <= 0 || parseFloat(amountB) <= 0) {
-            return "Enter amounts";
-        }
-        return "Add Liquidity";
+    const handleApproveA = () => {
+        if (!amountA) return;
+        setStatus("Approving TBTC...");
+        writeContract({
+            address: CONTRACTS.TBTC.address as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [CONTRACTS.Router.address, parseUnits(amountA, CONTRACTS.TBTC.decimals)],
+        });
+    };
+
+    const handleApproveB = () => {
+        if (!amountB) return;
+        setStatus("Approving TUSDC...");
+        writeContract({
+            address: CONTRACTS.TUSDC.address as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [CONTRACTS.Router.address, parseUnits(amountB, CONTRACTS.TUSDC.decimals)],
+        });
+    };
+
+    const handleAddLiquidity = () => {
+        if (!amountA || !amountB || !userAddress) return;
+        setStatus("Adding liquidity...");
+        const deadline = Math.floor(Date.now() / 1000) + 3600;
+
+        writeContract({
+            address: CONTRACTS.Router.address as `0x${string}`,
+            abi: ROUTER_ABI,
+            functionName: "addLiquidity",
+            args: [
+                CONTRACTS.TBTC.address,
+                CONTRACTS.TUSDC.address,
+                parseUnits(amountA, CONTRACTS.TBTC.decimals),
+                parseUnits(amountB, CONTRACTS.TUSDC.decimals),
+                0n,
+                0n,
+                userAddress,
+                BigInt(deadline),
+            ],
+        });
     };
 
     return (
@@ -106,17 +91,11 @@ export default function LiquidityInterface() {
                 <h2 className="card-title">Add Liquidity</h2>
             </div>
 
-            <p style={{ color: "var(--gray-600)", marginBottom: "1.5rem", fontSize: "0.875rem" }}>
-                Add liquidity to earn fees. You'll need to approve both tokens first.
-            </p>
-
-            {/* Token A */}
+            {/* TBTC Input */}
             <div className="token-input">
                 <div className="token-input-top">
-                    <div className="token-input-label">{tokenA.symbol}</div>
-                    <div className="token-balance">
-                        Balance: {balanceA.toFixed(6)}
-                    </div>
+                    <div className="token-input-label">TBTC</div>
+                    <div className="token-balance">Balance: {balanceA.toFixed(4)}</div>
                 </div>
                 <div className="token-input-main">
                     <input
@@ -127,35 +106,22 @@ export default function LiquidityInterface() {
                         onChange={(e) => setAmountA(e.target.value)}
                     />
                     <div className="token-select">
-                        <div className="token-icon">{tokenA.symbol[0]}</div>
-                        <span>{tokenA.symbol}</span>
+                        <div className="token-icon">T</div>
+                        <span>TBTC</span>
                     </div>
                 </div>
             </div>
 
             {/* Plus Icon */}
             <div style={{ display: "flex", justifyContent: "center", margin: "1rem 0" }}>
-                <div style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    background: "var(--surface)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "var(--text-secondary)",
-                }}>
-                    <FaPlus />
-                </div>
+                <FaPlus style={{ color: "var(--text-secondary)" }} />
             </div>
 
-            {/* Token B */}
+            {/* TUSDC Input */}
             <div className="token-input">
                 <div className="token-input-top">
-                    <div className="token-input-label">{tokenB.symbol}</div>
-                    <div className="token-balance">
-                        Balance: {balanceB.toFixed(6)}
-                    </div>
+                    <div className="token-input-label">TUSDC</div>
+                    <div className="token-balance">Balance: {balanceB.toFixed(4)}</div>
                 </div>
                 <div className="token-input-main">
                     <input
@@ -166,80 +132,54 @@ export default function LiquidityInterface() {
                         onChange={(e) => setAmountB(e.target.value)}
                     />
                     <div className="token-select">
-                        <div className="token-icon">{tokenB.symbol[0]}</div>
-                        <span>{tokenB.symbol}</span>
+                        <div className="token-icon">T</div>
+                        <span>TUSDC</span>
                     </div>
                 </div>
             </div>
 
-            {/* Price Info */}
-            {amountA && amountB && (
-                <div style={{
-                    padding: "1rem",
-                    background: "var(--gray-50)",
-                    borderRadius: "var(--radius-md)",
-                    marginTop: "1rem",
-                    fontSize: "0.875rem",
-                }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                        <span style={{ color: "var(--gray-600)" }}>Price</span>
-                        <span style={{ fontWeight: "600" }}>
-                            1 {tokenA.symbol} = {(parseFloat(amountB) / parseFloat(amountA)).toFixed(6)} {tokenB.symbol}
-                        </span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ color: "var(--gray-600)" }}>Network Fee</span>
-                        <span style={{ fontWeight: "600", color: "var(--midl-orange)" }}>
-                            ~0.0001 BTC
-                        </span>
-                    </div>
-                </div>
-            )}
-
             {/* Status */}
-            {hash && (
+            {status && (
                 <div style={{
-                    padding: "1rem",
+                    padding: "0.75rem",
                     background: "rgba(215, 123, 58, 0.1)",
                     borderRadius: "var(--radius-md)",
                     marginTop: "1rem",
                     fontSize: "0.875rem",
                     color: "var(--midl-orange)",
                 }}>
-                    {step === 'approve1' && "✓ Approving WBTC..."}
-                    {step === 'approve2' && "✓ Approving TBTC..."}
-                    {step === 'add' && "✓ Adding liquidity..."}
-                    <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", opacity: 0.8 }}>
-                        Tx: {hash.slice(0, 10)}...{hash.slice(-8)}
-                    </div>
+                    {isPending ? "⏳ " : ""}{status}
                 </div>
             )}
 
-            {/* Button */}
+            {/* Buttons */}
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "1.5rem" }}>
+                <button
+                    className="btn btn-secondary"
+                    onClick={handleApproveA}
+                    disabled={!isConnected || !amountA || isPending}
+                    style={{ flex: 1 }}
+                >
+                    1. Approve TBTC
+                </button>
+                <button
+                    className="btn btn-secondary"
+                    onClick={handleApproveB}
+                    disabled={!isConnected || !amountB || isPending}
+                    style={{ flex: 1 }}
+                >
+                    2. Approve TUSDC
+                </button>
+            </div>
+
             <button
                 className="btn btn-primary btn-lg w-full"
-                style={{ marginTop: "1.5rem" }}
+                style={{ marginTop: "0.75rem" }}
                 onClick={handleAddLiquidity}
-                disabled={
-                    !userAddress ||
-                    !amountA ||
-                    !amountB ||
-                    parseFloat(amountA) <= 0 ||
-                    parseFloat(amountB) <= 0 ||
-                    isPending
-                }
+                disabled={!isConnected || !amountA || !amountB || isPending}
             >
-                {getButtonText()}
+                {!isConnected ? "Connect Wallet" : "3. Add Liquidity"}
             </button>
-
-            <div style={{
-                textAlign: "center",
-                marginTop: "1rem",
-                fontSize: "0.875rem",
-                color: "var(--gray-500)",
-            }}>
-                💡 You'll be asked to sign 3 transactions: 2 approvals + add liquidity
-            </div>
         </div>
     );
 }

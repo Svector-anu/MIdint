@@ -62,7 +62,7 @@ export default function WalletConnect() {
                         style={{ marginBottom: "0.75rem" }}
                     >
                         <FaWallet />
-                        Connect with {connector.name}
+                        Connect with {connector.id}
                     </button>
                 ))}
             </div>

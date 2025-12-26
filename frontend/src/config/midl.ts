@@ -16,6 +16,6 @@ export const midlConfig = createConfig({
  */
 export const MIDL_NETWORK = {
     id: regtest.id,
-    name: regtest.name,
+    name: "Regtest",
     blockExplorer: "https://blockscout.regtest.midl.xyz",
 };

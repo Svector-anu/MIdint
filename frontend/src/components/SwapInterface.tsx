@@ -1,210 +1,175 @@
 import { useState, useEffect } from "react";
 import { FaArrowDown, FaCog } from "react-icons/fa";
-import { CONTRACTS, ROUTER_ABI } from "../config/contracts";
+import { CONTRACTS, ROUTER_ABI, ERC20_ABI } from "../config/contracts";
 import { parseUnits, formatUnits } from "ethers";
-import { useReadContracts } from "wagmi";
-import TransactionModal from "./TransactionModal";
-
-interface Token {
-    symbol: string;
-    address: string;
-    decimals: number;
-    name: string;
-}
+import { useReadContracts, useWriteContract } from "wagmi";
+import { useAccounts } from "@midl/react";
 
 export default function SwapInterface() {
-    const [fromToken, setFromToken] = useState<Token>(CONTRACTS.TBTC);
-    const [toToken, setToToken] = useState<Token>(CONTRACTS.TUSDC);
     const [fromAmount, setFromAmount] = useState("");
     const [toAmount, setToAmount] = useState("");
-    const [showTxModal, setShowTxModal] = useState(false);
+    const [status, setStatus] = useState("");
+
+    const { accounts, isConnected } = useAccounts();
+    const userAddress = accounts?.[0]?.address as `0x${string}` | undefined;
+
+    const { writeContract, isPending } = useWriteContract();
 
     // Get estimated output amount from Router
-    const { data: amountsOut, refetch: refetchAmounts } = useReadContracts({
+    const { data: amountsOut } = useReadContracts({
         contracts: [
             {
-                address: CONTRACTS.Router.address,
+                address: CONTRACTS.Router.address as `0x${string}`,
                 abi: ROUTER_ABI,
                 functionName: "getAmountsOut",
-                args:
-                    fromAmount && parseFloat(fromAmount) > 0
-                        ? [
-                            parseUnits(fromAmount, fromToken.decimals),
-                            [fromToken.address, toToken.address],
-                        ]
-                        : undefined,
+                args: fromAmount && parseFloat(fromAmount) > 0
+                    ? [
+                        parseUnits(fromAmount, CONTRACTS.TBTC.decimals),
+                        [CONTRACTS.TBTC.address, CONTRACTS.TUSDC.address],
+                    ]
+                    : undefined,
             },
         ],
-        query: {
-            enabled: Boolean(fromAmount && parseFloat(fromAmount) > 0),
-        },
+        query: { enabled: Boolean(fromAmount && parseFloat(fromAmount) > 0) },
     });
 
     // Update toAmount when estimate is fetched
     useEffect(() => {
-        if (amountsOut && amountsOut[0]?.result) {
+        if (amountsOut?.[0]?.result) {
             const amounts = amountsOut[0].result as bigint[];
-            if (amounts && amounts.length > 1) {
-                const outputAmount = formatUnits(amounts[1], toToken.decimals);
-                setToAmount(parseFloat(outputAmount).toFixed(6));
+            if (amounts?.length > 1) {
+                const output = formatUnits(amounts[1], CONTRACTS.TUSDC.decimals);
+                setToAmount(parseFloat(output).toFixed(6));
             }
         } else if (fromAmount && parseFloat(fromAmount) > 0) {
-            // Show 0 if no liquidity or error
-            setToAmount("0.0");
+            setToAmount("0.00");
         }
-    }, [amountsOut, toToken.decimals, fromAmount]);
+    }, [amountsOut, fromAmount]);
 
-    // Refetch when inputs change
-    useEffect(() => {
-        if (fromAmount && parseFloat(fromAmount) > 0) {
-            refetchAmounts();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fromAmount, fromToken, toToken]);
+    const handleApprove = () => {
+        if (!fromAmount) return;
+        setStatus("Approving TBTC for swap...");
+        writeContract({
+            address: CONTRACTS.TBTC.address as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [CONTRACTS.Router.address, parseUnits(fromAmount, CONTRACTS.TBTC.decimals)],
+        });
+    };
+
+    const handleSwap = () => {
+        if (!fromAmount || !userAddress) return;
+        setStatus("Swapping...");
+        const deadline = Math.floor(Date.now() / 1000) + 3600;
+
+        writeContract({
+            address: CONTRACTS.Router.address as `0x${string}`,
+            abi: ROUTER_ABI,
+            functionName: "swapExactTokensForTokens",
+            args: [
+                parseUnits(fromAmount, CONTRACTS.TBTC.decimals),
+                0n, // amountOutMin (0 for testing)
+                [CONTRACTS.TBTC.address, CONTRACTS.TUSDC.address],
+                userAddress,
+                BigInt(deadline),
+            ],
+        });
+    };
 
     const handleSwapTokens = () => {
-        setFromToken(toToken);
-        setToToken(fromToken);
         setFromAmount(toAmount);
         setToAmount(fromAmount);
     };
 
-    const handleSwap = () => {
-        setShowTxModal(true);
-        // Swap logic will be implemented in useSwap hook
-    };
-
     return (
-        <>
-            <div className="card">
-                <div className="card-header">
-                    <h2 className="card-title">Swap</h2>
-                    <button className="btn btn-sm btn-secondary">
-                        <FaCog />
-                    </button>
+        <div className="card">
+            <div className="card-header">
+                <h2 className="card-title">Swap</h2>
+                <button className="btn btn-sm btn-secondary"><FaCog /></button>
+            </div>
+
+            {/* From Token */}
+            <div className="token-input">
+                <div className="token-input-top">
+                    <div className="token-input-label">From</div>
+                    <div className="token-balance">Balance: 0.00</div>
                 </div>
-
-                {/* From Token */}
-                <div className="token-input">
-                    <div className="token-input-top">
-                        <div className="token-input-label">From</div>
-                        <div className="token-balance">Balance: 0.00</div>
+                <div className="token-input-main">
+                    <input
+                        type="number"
+                        className="token-amount"
+                        placeholder="0.0"
+                        value={fromAmount}
+                        onChange={(e) => setFromAmount(e.target.value)}
+                    />
+                    <div className="token-select">
+                        <div className="token-icon">T</div>
+                        <span>TBTC</span>
                     </div>
-                    <div className="token-input-main">
-                        <input
-                            type="number"
-                            className="token-amount"
-                            placeholder="0.0"
-                            value={fromAmount}
-                            onChange={(e) => setFromAmount(e.target.value)}
-                        />
-                        <div className="token-select">
-                            <div className="token-icon">{fromToken.symbol[0]}</div>
-                            <span>{fromToken.symbol}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Swap Arrow */}
-                <div className="swap-arrow-container">
-                    <button className="swap-arrow" onClick={handleSwapTokens}>
-                        <FaArrowDown />
-                    </button>
-                </div>
-
-                {/* To Token */}
-                <div className="token-input">
-                    <div className="token-input-top">
-                        <div className="token-input-label">To</div>
-                        <div className="token-balance">Balance: 0.00</div>
-                    </div>
-                    <div className="token-input-main">
-                        <input
-                            type="number"
-                            className="token-amount"
-                            placeholder="0.0"
-                            value={toAmount}
-                            onChange={(e) => setToAmount(e.target.value)}
-                            readOnly
-                        />
-                        <div className="token-select">
-                            <div className="token-icon">{toToken.symbol[0]}</div>
-                            <span>{toToken.symbol}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Price Info */}
-                {fromAmount && toAmount && parseFloat(toAmount) > 0 && (
-                    <div
-                        style={{
-                            padding: "1rem",
-                            background: "var(--gray-50)",
-                            borderRadius: "var(--radius-md)",
-                            marginTop: "1rem",
-                            fontSize: "0.875rem",
-                        }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                marginBottom: "0.5rem",
-                            }}
-                        >
-                            <span style={{ color: "var(--gray-600)" }}>Price</span>
-                            <span style={{ fontWeight: "600" }}>
-                                1 {fromToken.symbol} ≈{" "}
-                                {(parseFloat(toAmount) / parseFloat(fromAmount)).toFixed(6)}{" "}
-                                {toToken.symbol}
-                            </span>
-                        </div>
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                marginBottom: "0.5rem",
-                            }}
-                        >
-                            <span style={{ color: "var(--gray-600)" }}>Slippage</span>
-                            <span style={{ fontWeight: "600" }}>0.5%</span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--gray-600)" }}>Network Fee</span>
-                            <span style={{ fontWeight: "600", color: "var(--midl-orange)" }}>
-                                ~0.0001 BTC
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {/* Swap Button */}
-                <button
-                    className="btn btn-primary btn-lg w-full"
-                    style={{ marginTop: "1.5rem" }}
-                    onClick={handleSwap}
-                    disabled={!fromAmount || parseFloat(fromAmount) <= 0}
-                >
-                    {!fromAmount || parseFloat(fromAmount) <= 0
-                        ? "Enter an amount"
-                        : "Swap"}
-                </button>
-
-                <div
-                    style={{
-                        textAlign: "center",
-                        marginTop: "1rem",
-                        fontSize: "0.875rem",
-                        color: "var(--gray-500)",
-                    }}
-                >
-                    💡 This swap requires a Bitcoin L1 transaction
                 </div>
             </div>
 
-            {showTxModal && (
-                <TransactionModal onClose={() => setShowTxModal(false)} type="swap" />
+            {/* Swap Arrow */}
+            <div className="swap-arrow-container">
+                <button className="swap-arrow" onClick={handleSwapTokens}>
+                    <FaArrowDown />
+                </button>
+            </div>
+
+            {/* To Token */}
+            <div className="token-input">
+                <div className="token-input-top">
+                    <div className="token-input-label">To</div>
+                    <div className="token-balance">Balance: 0.00</div>
+                </div>
+                <div className="token-input-main">
+                    <input
+                        type="number"
+                        className="token-amount"
+                        placeholder="0.0"
+                        value={toAmount}
+                        readOnly
+                    />
+                    <div className="token-select">
+                        <div className="token-icon">T</div>
+                        <span>TUSDC</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Status */}
+            {status && (
+                <div style={{
+                    padding: "0.75rem",
+                    background: "rgba(215, 123, 58, 0.1)",
+                    borderRadius: "var(--radius-md)",
+                    marginTop: "1rem",
+                    fontSize: "0.875rem",
+                    color: "var(--midl-orange)",
+                }}>
+                    {isPending ? "⏳ " : ""}{status}
+                </div>
             )}
-        </>
+
+            {/* Buttons */}
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "1.5rem" }}>
+                <button
+                    className="btn btn-secondary"
+                    onClick={handleApprove}
+                    disabled={!isConnected || !fromAmount || isPending}
+                    style={{ flex: 1 }}
+                >
+                    1. Approve
+                </button>
+                <button
+                    className="btn btn-primary"
+                    onClick={handleSwap}
+                    disabled={!isConnected || !fromAmount || isPending}
+                    style={{ flex: 1 }}
+                >
+                    2. Swap
+                </button>
+            </div>
+        </div>
     );
 }

@@ -66,7 +66,7 @@ export default function Header({ activePage, onPageChange }: HeaderProps) {
                 </div>
 
                 <nav className="nav">
-                    {isConnected && accounts[0] ? (
+                    {isConnected && accounts && accounts[0] ? (
                         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                             <div style={{
                                 padding: "0.5rem 1rem",
@@ -75,7 +75,7 @@ export default function Header({ activePage, onPageChange }: HeaderProps) {
                                 fontSize: "0.875rem",
                                 fontWeight: "600"
                             }}>
-                                {truncateAddress(accounts[0].btcAddress)}
+                                {truncateAddress(accounts[0].address)}
                             </div>
                             <button onClick={() => disconnect()} className="btn btn-secondary btn-sm">
                                 Disconnect
