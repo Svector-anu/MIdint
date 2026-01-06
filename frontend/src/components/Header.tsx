@@ -10,9 +10,11 @@ interface HeaderProps {
 export default function Header({ activePage, onPageChange }: HeaderProps) {
     const { isConnected, accounts } = useAccounts();
     const { disconnect } = useDisconnect();
-    const { connectors, connect } = useConnect({
-        purposes: [AddressPurpose.Ordinals],
+    const { connectors, connect, error, isPending } = useConnect({
+        purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
     });
+
+    console.log("Wallet state:", { isConnected, accounts, connectors, error, isPending });
 
     const truncateAddress = (address: string | undefined) => {
         if (!address) return "";
