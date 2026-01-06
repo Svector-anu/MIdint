@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAccounts } from "@midl/react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseUnits } from "ethers";
-import { CONTRACTS } from "../config/contracts";
+import { CONTRACTS, ERC20_ABI } from "../config/contracts";
 import { FaFaucet } from "react-icons/fa";
 
 export default function TokenFaucet() {
@@ -13,7 +13,7 @@ export default function TokenFaucet() {
     const { writeContract, data: hash } = useWriteContract();
     const { isSuccess } = useWaitForTransactionReceipt({ hash });
 
-    const mintTokens = async (tokenSymbol: 'TBTC' | 'TUSDC' | 'WBTC') => {
+    const mintTokens = async (tokenSymbol: 'TBTC' | 'WBTC') => {
         if (!userAddress) return;
 
         setMinting(tokenSymbol);
@@ -22,14 +22,20 @@ export default function TokenFaucet() {
             const token = CONTRACTS[tokenSymbol];
             const amount = tokenSymbol === 'WBTC'
                 ? parseUnits("10", 18)  // 10 WBTC
-                : tokenSymbol === 'TBTC'
-                    ? parseUnits("1000", 8)  // 1000 TBTC
-                    : parseUnits("100000", 6); // 100,000 TUSDC
+                : parseUnits("1000", 8);  // 1000 TBTC
 
-            // For WBTC, we need to deposit (it's a wrapper)
-            if (tokenSymbol === 'WBTC') {
+            // For TBTC, call mint (it's a TestToken)
+            if (tokenSymbol === 'TBTC') {
                 writeContract({
-                    address: token.address as `0x${string}`,
+                    address: token.address,
+                    abi: ERC20_ABI,
+                    functionName: "mint",
+                    args: [userAddress, amount],
+                });
+            } else {
+                // For WBTC, deposit native BTC (send value)
+                writeContract({
+                    address: token.address,
                     abi: [{
                         "inputs": [],
                         "name": "deposit",
@@ -39,23 +45,6 @@ export default function TokenFaucet() {
                     }],
                     functionName: "deposit",
                     value: amount,
-                });
-            } else {
-                // For test tokens, call mint
-                writeContract({
-                    address: token.address as `0x${string}`,
-                    abi: [{
-                        "inputs": [
-                            { "name": "to", "type": "address" },
-                            { "name": "amount", "type": "uint256" }
-                        ],
-                        "name": "mint",
-                        "outputs": [],
-                        "stateMutability": "nonpayable",
-                        "type": "function"
-                    }],
-                    functionName: "mint",
-                    args: [userAddress, amount],
                 });
             }
         } catch (error) {
@@ -88,6 +77,7 @@ export default function TokenFaucet() {
             background: "var(--surface)",
             borderRadius: "var(--radius-lg)",
             border: "1px solid var(--gray-200)",
+            marginBottom: "1.5rem",
         }}>
             <div style={{
                 display: "flex",
@@ -106,35 +96,23 @@ export default function TokenFaucet() {
                 </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <div style={{ display: "flex", gap: "0.75rem" }}>
                 <button
                     onClick={() => mintTokens('TBTC')}
                     disabled={minting === 'TBTC'}
                     className="btn btn-secondary"
-                    style={{ width: "100%", justifyContent: "space-between" }}
+                    style={{ flex: 1 }}
                 >
-                    <span>Get 1,000 TBTC</span>
-                    {minting === 'TBTC' && <span>⏳</span>}
-                </button>
-
-                <button
-                    onClick={() => mintTokens('TUSDC')}
-                    disabled={minting === 'TUSDC'}
-                    className="btn btn-secondary"
-                    style={{ width: "100%", justifyContent: "space-between" }}
-                >
-                    <span>Get 100,000 TUSDC</span>
-                    {minting === 'TUSDC' && <span>⏳</span>}
+                    {minting === 'TBTC' ? '⏳' : 'Get 1,000 TBTC'}
                 </button>
 
                 <button
                     onClick={() => mintTokens('WBTC')}
                     disabled={minting === 'WBTC'}
                     className="btn btn-secondary"
-                    style={{ width: "100%", justifyContent: "space-between" }}
+                    style={{ flex: 1 }}
                 >
-                    <span>Get 10 WBTC</span>
-                    {minting === 'WBTC' && <span>⏳</span>}
+                    {minting === 'WBTC' ? '⏳' : 'Get 10 WBTC'}
                 </button>
             </div>
 

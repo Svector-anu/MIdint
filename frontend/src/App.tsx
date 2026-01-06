@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import SwapInterface from "./components/SwapInterface";
 import LiquidityInterface from "./components/LiquidityInterface";
 import PoolsPage from "./components/PoolsPage";
+import TokenFaucet from "./components/TokenFaucet";
 
 export default function App() {
     const [activePage, setActivePage] = useState<"trade" | "pools">("trade");
@@ -34,6 +35,9 @@ export default function App() {
                         >
                             Powered by MIDL Protocol
                         </p>
+
+                        {/* Token Faucet */}
+                        <TokenFaucet />
 
                         {/* Tab Navigation */}
                         <div className="tabs">

@@ -13,12 +13,6 @@ export const CONTRACTS = {
         symbol: "TBTC",
         name: "Test Bitcoin",
     },
-    TUSDC: {
-        address: "0xA4D2CbAF027125a967E48e94b1Baa03363981b1c" as `0x${string}`, // Same as TBTC for testing
-        decimals: 6,
-        symbol: "TUSDC",
-        name: "Test USD Coin",
-    },
     WBTC: {
         address: "0xca0daeff9cB8DED3EEF075Df62aDBb1522479639" as `0x${string}`,
         decimals: 18,
@@ -81,6 +75,16 @@ export const ERC20_ABI = [
         ],
         name: "allowance",
         outputs: [{ name: "", type: "uint256" }],
+        type: "function",
+    },
+    {
+        constant: false,
+        inputs: [
+            { name: "to", type: "address" },
+            { name: "amount", type: "uint256" },
+        ],
+        name: "mint",
+        outputs: [],
         type: "function",
     },
 ] as const;

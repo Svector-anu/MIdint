@@ -14,9 +14,9 @@ const deploy: DeployFunction = async (hre) => {
     // Initialize MIDL SDK
     await hre.midl.initialize();
 
-    // Deploy TBTC with unique contract name
-    const tbtc = await hre.midl.deploy("TestTokenTBTC", {
-        contract: "TestToken",
+    // Deploy TBTC
+    console.log("Deploying TBTC...");
+    const tbtc = await hre.midl.deploy("TestToken", {
         args: [
             "Test Bitcoin",
             "TBTC",
@@ -25,9 +25,9 @@ const deploy: DeployFunction = async (hre) => {
         ],
     });
 
-    // Deploy TUSDC with unique contract name
-    const tusdc = await hre.midl.deploy("TestTokenTUSDC", {
-        contract: "TestToken",
+    // Deploy TUSDC (need to deploy as separate instance)
+    console.log("Deploying TUSDC...");
+    const tusdc = await hre.midl.deploy("TestToken", {
         args: [
             "Test USD Coin",
             "TUSDC",
@@ -49,7 +49,7 @@ const deploy: DeployFunction = async (hre) => {
     addresses.TUSDC = tusdc?.address;
     writeFileSync(addressesPath, JSON.stringify(addresses, null, 2));
 
-    console.log("✅ Test tokens deployed successfully!");
+    console.log("\n✅ Test tokens deployed successfully!");
     console.log(`   TBTC: ${tbtc?.address}`);
     console.log(`   TUSDC: ${tusdc?.address}\n`);
 };

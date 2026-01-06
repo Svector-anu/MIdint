@@ -19,13 +19,13 @@ export default function LiquidityInterface() {
     const { data: balances } = useReadContracts({
         contracts: [
             {
-                address: CONTRACTS.TBTC.address as `0x${string}`,
+                address: CONTRACTS.TBTC.address,
                 abi: ERC20_ABI,
                 functionName: "balanceOf",
                 args: userAddress ? [userAddress] : undefined,
             },
             {
-                address: CONTRACTS.TUSDC.address as `0x${string}`,
+                address: CONTRACTS.WBTC.address,
                 abi: ERC20_ABI,
                 functionName: "balanceOf",
                 args: userAddress ? [userAddress] : undefined,
@@ -38,14 +38,14 @@ export default function LiquidityInterface() {
         ? Number(balances[0].result as bigint) / 10 ** CONTRACTS.TBTC.decimals
         : 0;
     const balanceB = balances?.[1]?.result
-        ? Number(balances[1].result as bigint) / 10 ** CONTRACTS.TUSDC.decimals
+        ? Number(balances[1].result as bigint) / 10 ** CONTRACTS.WBTC.decimals
         : 0;
 
     const handleApproveA = () => {
         if (!amountA) return;
         setStatus("Approving TBTC...");
         writeContract({
-            address: CONTRACTS.TBTC.address as `0x${string}`,
+            address: CONTRACTS.TBTC.address,
             abi: ERC20_ABI,
             functionName: "approve",
             args: [CONTRACTS.Router.address, parseUnits(amountA, CONTRACTS.TBTC.decimals)],
@@ -54,12 +54,12 @@ export default function LiquidityInterface() {
 
     const handleApproveB = () => {
         if (!amountB) return;
-        setStatus("Approving TUSDC...");
+        setStatus("Approving WBTC...");
         writeContract({
-            address: CONTRACTS.TUSDC.address as `0x${string}`,
+            address: CONTRACTS.WBTC.address,
             abi: ERC20_ABI,
             functionName: "approve",
-            args: [CONTRACTS.Router.address, parseUnits(amountB, CONTRACTS.TUSDC.decimals)],
+            args: [CONTRACTS.Router.address, parseUnits(amountB, CONTRACTS.WBTC.decimals)],
         });
     };
 
@@ -69,14 +69,14 @@ export default function LiquidityInterface() {
         const deadline = Math.floor(Date.now() / 1000) + 3600;
 
         writeContract({
-            address: CONTRACTS.Router.address as `0x${string}`,
+            address: CONTRACTS.Router.address,
             abi: ROUTER_ABI,
             functionName: "addLiquidity",
             args: [
                 CONTRACTS.TBTC.address,
-                CONTRACTS.TUSDC.address,
+                CONTRACTS.WBTC.address,
                 parseUnits(amountA, CONTRACTS.TBTC.decimals),
-                parseUnits(amountB, CONTRACTS.TUSDC.decimals),
+                parseUnits(amountB, CONTRACTS.WBTC.decimals),
                 0n,
                 0n,
                 userAddress,
@@ -117,10 +117,10 @@ export default function LiquidityInterface() {
                 <FaPlus style={{ color: "var(--text-secondary)" }} />
             </div>
 
-            {/* TUSDC Input */}
+            {/* WBTC Input */}
             <div className="token-input">
                 <div className="token-input-top">
-                    <div className="token-input-label">TUSDC</div>
+                    <div className="token-input-label">WBTC</div>
                     <div className="token-balance">Balance: {balanceB.toFixed(4)}</div>
                 </div>
                 <div className="token-input-main">
@@ -132,8 +132,8 @@ export default function LiquidityInterface() {
                         onChange={(e) => setAmountB(e.target.value)}
                     />
                     <div className="token-select">
-                        <div className="token-icon">T</div>
-                        <span>TUSDC</span>
+                        <div className="token-icon">W</div>
+                        <span>WBTC</span>
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@ export default function LiquidityInterface() {
                     disabled={!isConnected || !amountB || isPending}
                     style={{ flex: 1 }}
                 >
-                    2. Approve TUSDC
+                    2. Approve WBTC
                 </button>
             </div>
 
