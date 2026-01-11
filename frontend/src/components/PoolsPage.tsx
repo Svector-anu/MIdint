@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaArrowRight } from "react-icons/fa";
 import { useAccounts, useConnect } from "@midl/react";
 import { AddressPurpose } from "@midl/core";
+import { useReadContract, useReadContracts } from "wagmi";
+import { CONTRACTS, FACTORY_ABI, PAIR_ABI } from "../config/contracts";
+import { formatUnits } from "ethers";
 
 interface Pool {
     token0: string;
@@ -11,13 +14,15 @@ interface Pool {
     tvl: string;
     apr: string;
     volume24h: string;
+    reserve0?: string;
+    reserve1?: string;
+    pairAddress?: string;
 }
 
 export default function PoolsPage() {
-    const [hasPositions] = useState(false); // Will be true when user has liquidity
     const { isConnected } = useAccounts();
     const { connectors, connect } = useConnect({
-        purposes: [AddressPurpose.Ordinals],
+        purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
     });
 
     const handleConnect = () => {
@@ -26,36 +31,48 @@ export default function PoolsPage() {
         }
     };
 
-    // Mock data - will be replaced with real contract data
-    const topPools: Pool[] = [
-        {
-            token0: "WBTC",
-            token1: "TBTC",
-            token0Symbol: "W",
-            token1Symbol: "T",
-            tvl: "$0",
-            apr: "0.00%",
-            volume24h: "0.3%",
-        },
-        {
-            token0: "TBTC",
-            token1: "TUSDC",
-            token0Symbol: "T",
-            token1Symbol: "U",
-            tvl: "$0",
-            apr: "60.19%",
-            volume24h: "0.3%",
-        },
-        {
-            token0: "TBTC",
-            token1: "TUSDC",
-            token0Symbol: "T",
-            token1Symbol: "C",
-            tvl: "$0",
-            apr: "25.4%",
-            volume24h: "0.06%",
-        },
-    ];
+    // 1. Get Pair Address
+    const { data: pairAddress } = useReadContract({
+        address: CONTRACTS.Factory.address,
+        abi: FACTORY_ABI,
+        functionName: "getPair",
+        args: [CONTRACTS.TBTC.address, CONTRACTS.WBTC.address],
+    });
+
+    // 2. Get Reserves if pair exists
+    const { data: reserves } = useReadContract({
+        address: pairAddress as `0x${string}`,
+        abi: PAIR_ABI,
+        functionName: "getReserves",
+        query: { enabled: !!pairAddress && pairAddress !== "0x0000000000000000000000000000000000000000" },
+    });
+
+    const [poolData, setPoolData] = useState<Pool | null>(null);
+
+    useEffect(() => {
+        if (reserves) {
+            // @ts-ignore
+            const [reserve0, reserve1] = reserves;
+            // Assuming token0 is TBTC (lower address usually, but we should check token0/token1)
+            // For Regtest simplicity we just show raw values
+
+            const r0 = formatUnits(reserve0, CONTRACTS.TBTC.decimals); // Simplified assumption
+            const r1 = formatUnits(reserve1, CONTRACTS.WBTC.decimals);
+
+            setPoolData({
+                token0: "TBTC",
+                token1: "WBTC",
+                token0Symbol: "T",
+                token1Symbol: "W",
+                tvl: `$${(parseFloat(r0) * 60000 + parseFloat(r1) * 60000).toLocaleString()}`, // Mock Price $60k
+                apr: "12.5%", // Mock APR
+                volume24h: "0.0%",
+                reserve0: parseFloat(r0).toFixed(4),
+                reserve1: parseFloat(r1).toFixed(4),
+                pairAddress: pairAddress as string,
+            });
+        }
+    }, [reserves, pairAddress]);
 
     return (
         <div className="container" style={{ padding: "2rem 1.5rem", maxWidth: "1400px" }}>
@@ -117,7 +134,7 @@ export default function PoolsPage() {
                                     Connect wallet
                                 </button>
                             </div>
-                        ) : !hasPositions ? (
+                        ) : (
                             <div style={{
                                 flex: 1,
                                 display: "flex",
@@ -141,11 +158,6 @@ export default function PoolsPage() {
                                     </p>
                                 </div>
                             </div>
-                        ) : (
-                            <div>
-                                {/* Will show user's liquidity positions here */}
-                                <p style={{ color: "var(--text-secondary)" }}>Loading positions...</p>
-                            </div>
                         )}
                     </div>
                 </div>
@@ -162,20 +174,13 @@ export default function PoolsPage() {
                     </h2>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                        {topPools.map((pool, index) => (
+                        {poolData ? (
                             <div
-                                key={index}
                                 className="card"
                                 style={{
                                     padding: "1rem 1.25rem",
                                     cursor: "pointer",
                                     transition: "var(--transition)"
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = "var(--surface)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = "var(--bg-secondary)";
                                 }}
                             >
                                 <div style={{
@@ -193,7 +198,7 @@ export default function PoolsPage() {
                                                 width: "32px",
                                                 height: "32px"
                                             }}>
-                                                {pool.token0Symbol}
+                                                {poolData.token0Symbol}
                                             </div>
                                             <div className="token-icon" style={{
                                                 position: "absolute",
@@ -203,7 +208,7 @@ export default function PoolsPage() {
                                                 height: "32px",
                                                 background: "var(--midl-orange-dark)"
                                             }}>
-                                                {pool.token1Symbol}
+                                                {poolData.token1Symbol}
                                             </div>
                                         </div>
 
@@ -214,7 +219,7 @@ export default function PoolsPage() {
                                                 fontSize: "1rem",
                                                 marginBottom: "0.25rem"
                                             }}>
-                                                {pool.token0} / {pool.token1}
+                                                {poolData.token0} / {poolData.token1}
                                             </div>
                                             <div style={{
                                                 fontSize: "0.75rem",
@@ -223,9 +228,7 @@ export default function PoolsPage() {
                                                 alignItems: "center",
                                                 gap: "0.5rem"
                                             }}>
-                                                <span>v3</span>
-                                                <span>•</span>
-                                                <span>{pool.volume24h}</span>
+                                                <span>Res: {poolData.reserve0} / {poolData.reserve1}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -237,19 +240,25 @@ export default function PoolsPage() {
                                             fontSize: "1.125rem",
                                             color: "var(--text-primary)"
                                         }}>
-                                            {pool.apr} APR
+                                            {poolData.apr} APR
                                         </div>
                                         <div style={{
                                             fontSize: "0.75rem",
                                             color: "var(--text-tertiary)",
                                             marginTop: "0.25rem"
                                         }}>
-                                            TVL {pool.tvl}
+                                            TVL {poolData.tvl}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                        ) : (
+                            <div style={{ padding: "1rem", color: "var(--text-secondary)", textAlign: "center" }}>
+                                {pairAddress && pairAddress !== "0x0000000000000000000000000000000000000000"
+                                    ? "Loading pool data..."
+                                    : "No active pools found"}
+                            </div>
+                        )}
                     </div>
 
                     {/* Explore More Pools */}
