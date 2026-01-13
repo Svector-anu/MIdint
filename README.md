@@ -1,4 +1,4 @@
-# 🚀 MIDL DEX Starter Kit
+#  MIDL DEX Starter Kit
 
 **Build a real DEX on Bitcoin in 20 minutes!**
 
@@ -22,7 +22,7 @@ This guide walks you through everything step-by-step. No prior Bitcoin or DeFi e
 
 ---
 
-## 🎯 What is This?
+##  What is This?
 
 This starter kit includes:
 
@@ -32,7 +32,7 @@ This starter kit includes:
 - ✅ **Frontend UI** - React interface (optional)
 - ✅ **Complete Docs** - Step-by-step guides
 
-## 🏃 Super Quick Start
+##  Super Quick Start
 
 ### Prerequisites
 
@@ -67,7 +67,7 @@ npx hardhat deploy --tags Faucet --network default
 npx hardhat deploy --tags TestDex --network default
 ```
 
-## 📚 Documentation
+##  Documentation
 
 ### Main Tutorials
 
@@ -87,7 +87,7 @@ npx hardhat deploy --tags TestDex --network default
 - **[FRONTEND_FIX.md](./FRONTEND_FIX.md)** - Frontend implementation details
 - **[SCREENSHOTS.md](./SCREENSHOTS.md)** - Tutorial screenshots guide
 
-## 🏗️ Architecture
+##  Architecture
 
 ### Smart Contracts
 
@@ -136,7 +136,7 @@ Output:
 ```
 🚰 MIDL Token Faucet
 Minting tokens to: 0xF8483dddbCB103519F8BfE1713aBDa4f3A9C20b0
-🪙 Minting 1,000 TBTC...
+ Minting 1,000 TBTC...
    ✅ 1,000 TBTC minted!
 ```
 
@@ -160,7 +160,7 @@ Output:
 
 https://blockscout.regtest.midl.xyz/address/YOUR_ADDRESS
 
-## 📊 Contract Addresses (MIDL Regtest)
+##  Contract Addresses (MIDL Regtest)
 
 | Contract | Address |
 |----------|---------|
@@ -169,7 +169,7 @@ https://blockscout.regtest.midl.xyz/address/YOUR_ADDRESS
 | Factory | `0xde6c29923d7BB9FDbcDfEC54E7e726894B982593` |
 | Router | `0x29cf3A9B709f94Eb46fBbA67753B90E721ddC9Ed` |
 
-## 🎓 Learning Path
+##  Learning Path
 
 1. **Start Here**: Read [SCRIPT_TUTORIAL.md](./SCRIPT_TUTORIAL.md)
 2. **Deploy Contracts**: Follow the Quick Start guide
@@ -177,7 +177,7 @@ https://blockscout.regtest.midl.xyz/address/YOUR_ADDRESS
 4. **Verify**: Check transactions on Blockscout
 5. **Customize**: Modify scripts for your use case
 
-## 🛠️ Development
+##  Development
 
 ### Run Frontend (Optional)
 
@@ -208,7 +208,7 @@ async function main() {
 main().catch(console.error);
 ```
 
-## 🔐 Security
+##  Security
 
 - ✅ Use **TEST WALLETS ONLY** for development
 - ✅ Never commit private keys or mnemonics
@@ -229,7 +229,7 @@ main().catch(console.error);
 - RPC: `https://rpc.mainnet.midl.xyz`
 - Explorer: `https://blockscout.mainnet.midl.xyz`
 
-## 📝 Environment Variables
+##  Environment Variables
 
 Create `contracts/.env`:
 
@@ -238,7 +238,7 @@ MNEMONIC="your twelve word test wallet mnemonic here"
 RPC_URL="https://rpc.regtest.midl.xyz"
 ```
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions welcome! Please:
 
@@ -281,7 +281,7 @@ MIDL RPC (wraps in BTC tx)
 Bitcoin L1 Execution
 ```
 
-## 🎯 Next Steps
+##  Next Steps
 
 1. ✅ **Customize Scripts** - Modify for your use case
 2. ✅ **Add Features** - Multi-hop swaps, price oracles
@@ -289,12 +289,12 @@ Bitcoin L1 Execution
 4. ✅ **Build Frontend** - Create read-only UI
 5. ✅ **Audit & Launch** - Security review and mainnet
 
-## 📞 Support
+##  Support
 
 - **Issues**: https://github.com/Svector-anu/midint/issues
 - **Discussions**: https://github.com/Svector-anu/midint/discussions
-- **MIDL Discord**: [Join here](https://discord.gg/midl)
+- **MIDL telegram *: [Join here](t.me/@midl_xyz)
 
 ---
 
-**Built with ❤️ on Bitcoin** | **Powered by MIDL**
+**Built by Anu ** | **Powered by MIDL**
