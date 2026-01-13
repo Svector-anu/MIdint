@@ -173,9 +173,15 @@ You'll see output like this:
 
 ## 💰 Part 4: Get Some Test Tokens (2 minutes)
 
-You need tokens to trade! Let's mint some.
+You need tokens to trade! You can get them in two ways:
 
-### Run the Faucet Script
+### Option 1: Use the Web Faucet (Recommended)
+
+1. Visit [https://faucet.regtest.midl.xyz/](https://faucet.regtest.midl.xyz/)
+2. Enter your Bitcoin address
+3. Request funds
+
+### Option 2: Run the Faucet Script
 
 ```bash
 npx hardhat deploy --tags Faucet --network default
