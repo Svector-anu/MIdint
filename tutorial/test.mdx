@@ -1,48 +1,60 @@
 ---
-title: 'Step 3: Mint & Trade'
-description: 'Execute your first transactions on Bitcoin'
-icon: 'flask'
+title: 'Testing the DEX'
+description: 'Verify your DEX functionality with automated tests'
+icon: 'vial'
 ---
 
-## Minting Test Tokens
+## Testing Trading Functionality
 
-Before you can trade, you need tokens! We've included a faucet script to make this easy.
+Once your contracts are deployed, it's time to verify that everything works as expected. We've provided scripts to simulate the entire DEX lifecycle: minting, approving, adding liquidity, and swapping.
 
-### 1. Run the Faucet
+### 1. Minting Test Tokens (Faucet)
 
-Execute the faucet tag to mint 1,000 TBTC to your wallet:
+To perform any trades, your wallet needs tokens. Use the internal faucet script to mint 1,000 TBTC to your deployer address.
 
 ```bash
+cd contracts
 npx hardhat deploy --tags Faucet --network default
 ```
 
-<img src="/docs/screenshots/01_faucet_output.png" alt="Faucet Terminal Output" />
+<img src="/docs/screenshots/01_faucet_output.png" alt="Faucet Output" />
 
-### 2. Execute the DEX Test
+### 2. The Complete DEX Flow
 
-Now, let's run a full automated test that performs approvals, adds liquidity, and does a swap—all in one go.
+We've created a comprehensive test script that performs a full end-to-end flow. This is the best way to verify your setup.
 
 ```bash
 npx hardhat deploy --tags TestDex --network default
 ```
 
-<img src="/docs/screenshots/02_testdex_output.png" alt="DEX Test Terminal Output" />
+**What this script does:**
+1. **Approve**: Grants the Router permission to spend your TBTC and WBTC.
+2. **Add Liquidity**: Deposits tokens into the TBTC/WBTC pool.
+3. **Swap**: Performs a swap of TBTC for WBTC.
 
-### What did the test do?
+<img src="/docs/screenshots/02_testdex_output.png" alt="TestDex Output" />
 
-1.  **Approved** the Router to spend your TBTC and WBTC.
-2.  **Added** 100 TBTC and 1 WBTC into the liquidity pool.
-3.  **Swapped** 10 TBTC for WBTC to test the pricing math.
+### 3. Manual Testing via Console
+
+If you want to interact with the contracts manually, you can use the Hardhat console:
+
+```bash
+npx hardhat console --network default
+```
+
+Example: Checking your TBTC balance
+```javascript
+const tbtc = await ethers.getContractAt("TestToken", "YOUR_TBTC_ADDRESS");
+const balance = await tbtc.balanceOf("YOUR_WALLET_ADDRESS");
+console.log(ethers.utils.formatUnits(balance, 8));
+```
 
 ---
 
-## Let's see it on-chain
-The final step is verifying that these transactions actually happened on the Bitcoin blockchain.
+## Technical Verification
 
-<Card
-  title="Step 4: Verify Assets"
-  icon="check"
-  href="/tutorial/verify"
->
-  Check your balances on Blockscout
+After running the tests, you should verify the transactions on the blockchain.
+
+<Card title="Part 4: Verification" icon="magnifying-glass" href="/tutorial/verify">
+  Learn how to use Blockscout to verify your transactions on Bitcoin.
 </Card>

@@ -1,0 +1,66 @@
+---
+title: 'Supported Networks'
+description: 'RPC endpoints and network details for MidInt'
+icon: 'network-wired'
+---
+
+## Network Details
+
+MidInt currently supports three primary networks: Regtest (Local Development), Testnet (Public Testing), and Mainnet (Production).
+
+### MIDL Regtest (Development)
+
+This is the primary environment for this starter kit.
+
+- **RPC URL**: `https://rpc.regtest.midl.xyz`
+- **Chain ID**: `18332`
+- **Symbol**: `BTC`
+- **Explorer**: [https://blockscout.regtest.midl.xyz](https://blockscout.regtest.midl.xyz)
+
+### MIDL Testnet (Public Testing)
+
+- **RPC URL**: `https://rpc.testnet.midl.xyz`
+- **Chain ID**: `18333`
+- **Symbol**: `BTC`
+- **Explorer**: [https://blockscout.testnet.midl.xyz](https://blockscout.testnet.midl.xyz)
+
+### MIDL Mainnet (Production)
+
+- **RPC URL**: `https://rpc.mainnet.midl.xyz`
+- **Chain ID**: `18334`
+- **Symbol**: `BTC`
+- **Explorer**: [https://blockscout.mainnet.midl.xyz](https://blockscout.mainnet.midl.xyz)
+
+---
+
+## Hardhat Configuration Example
+
+To add these networks to your Hardhat project, update your `hardhat.config.ts`:
+
+```typescript
+const config: HardhatUserConfig = {
+  networks: {
+    default: {
+      url: "https://rpc.regtest.midl.xyz",
+      accounts: { mnemonic: process.env.MNEMONIC },
+    },
+    midlTestnet: {
+      url: "https://rpc.testnet.midl.xyz",
+      accounts: { mnemonic: process.env.MNEMONIC },
+    },
+    midlMainnet: {
+      url: "https://rpc.mainnet.midl.xyz",
+      accounts: { mnemonic: process.env.MNEMONIC },
+    },
+  },
+};
+```
+
+---
+
+## Block Times and Finality
+
+MidInt transactions settle on the Bitcoin blockchain.
+
+- **Confirmations**: Typically 1 confirmation on Bitcoin is sufficient for most MidInt operations.
+- **Settlement**: While EVM execution is near-instant in the MidInt runtime, finality is tied to the Bitcoin block production (~10 minutes per block).

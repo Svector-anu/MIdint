@@ -1,0 +1,48 @@
+---
+title: 'Working with Custom Tokens'
+description: 'How to add and trade any ERC20 token on MidInt'
+icon: 'coins'
+---
+
+## Expanding the Ecosystem
+
+The MidInt DEX is built on the Uniswap V2 architecture, which means it can support any standard ERC20 token. This guide explains how to deploy your own token and create a trading pair for it.
+
+### 1. Deploying a New Token
+
+You can use the `TestToken.sol` contract as a template for your own tokens.
+
+```bash
+# Deploys a new token using the deploy script
+npx hardhat deploy --tags MyNewToken --network default
+```
+
+### 2. Creating a Trading Pair
+
+To trade your new token against TBTC, you must first create a pair using the Factory contract.
+
+```javascript
+const factory = await ethers.getContractAt("UniswapV2Factory", FACTORY_ADDRESS);
+await factory.createPair(NEW_TOKEN_ADDRESS, TBTC_ADDRESS);
+```
+
+### 3. Adding Initial Liquidity
+
+A pair exists but has no price until liquidity is added. You must deposit both tokens in the desired ratio.
+
+<Warning>
+**Initial Price**: The first person to add liquidity sets the initial price. Ensure you are depositing the correct ratio of tokens.
+</Warning>
+
+### 4. Integration Checklist
+
+When adding a new token to your frontend, remember to:
+1. Update your `constants/tokens.ts` with the new address.
+2. Add the token's icon/logo assets.
+3. Ensure the decimals are correctly handled (standard is 18, but TBTC uses 8).
+
+---
+
+## Example: Deploying "GOLD" Token
+
+Check out `contracts/deploy/00_deploy_tokens.ts` to see how we deployed TBTC and WBTC. You can follow that pattern to add as many tokens as you want!

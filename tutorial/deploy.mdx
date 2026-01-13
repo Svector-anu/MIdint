@@ -1,55 +1,64 @@
 ---
-title: 'Step 2: Deploy to Bitcoin'
-description: 'Launch your Uniswap V2 DEX on Bitcoin Layer 1'
-icon: 'rocket'
+title: 'Deploying Contracts'
+description: 'How to deploy your tokens and DEX to Bitcoin L1'
+icon: 'cloud-arrow-up'
 ---
 
-## Launching the DEX
+## Deploying to Bitcoin L1
 
-Now we're going to deploy a complete Uniswap V2 infrastructure to Bitcoin. This includes the Factory, the Router, and our trading pair.
+MidInt uses `hardhat-deploy` to manage contract deployments. Deploying to MidInt is very similar to deploying to Ethereum, but the transactions are ultimately settled on the Bitcoin blockchain.
 
-### Execute Deployment
+### Deployment Architecture
 
-Run the follow command to deploy everything:
+Our deployment process is broken down into several modular scripts located in `contracts/deploy/`. This allows for selective deployment and better management.
+
+- `00_deploy_tokens`: Deploys TBTC and WBTC.
+- `02_deploy_factory`: Deploys the Uniswap V2 Factory.
+- `03_deploy_router`: Deploys the Uniswap V2 Router.
+- `04_create_pair`: Creates the initial TBTC/WBTC trading pair.
+- `05_add_liquidity`: Seeds the pool with initial liquidity.
+
+### 1. The Deployment Command
+
+To deploy everything to the default MidInt Regtest network, run:
 
 ```bash
+cd contracts
 npx hardhat deploy --network default
 ```
 
-### What's happening?
+<Tip>
+The `default` network in our config is mapped to MidInt Regtest.
+</Tip>
 
-<AccordionGroup>
-  <Accordion icon="coins" title="1. Token Deployment">
-    We deploy **TBTC** (Test BTC) and **WBTC** (Wrapped BTC) to use inside our DEX.
-  </Accordion>
-  <Accordion icon="factory" title="2. Uniswap Factory">
-    The engine that creates and manages trading pairs.
-  </Accordion>
-  <Accordion icon="route" title="3. Uniswap Router">
-    The contract that handles all your swaps and liquidity provision.
-  </Accordion>
-  <Accordion icon="droplet" title="4. Pair & Liquidity">
-    We create the TBTC/WBTC pair and add the first bit of liquidity so others can trade!
-  </Accordion>
-</AccordionGroup>
+### 2. Verifying Deployment Success
 
-### View Transaction logs
+After the script finishes, you will see a summary of deployed contracts and their addresses. You should save these addresses as you'll need them for your frontend configuration.
 
-Your terminal will show the contract addresses as they are deployed. 
+### 3. Deployment Tags
 
-<Check>
-  Once complete, your DEX is live on Bitcoin! 
-</Check>
+You can use tags to deploy specific components. For example, if you only want to deploy the tokens:
+
+```bash
+npx hardhat deploy --tags Tokens --network default
+```
+
+Commonly used tags in this project:
+- `Tokens`: TBTC and WBTC
+- `Factory`: Uniswap V2 Factory
+- `Router`: Uniswap V2 Router
+- `Setup`: Complete DEX setup (Factory + Router + Pair + Liquidity)
 
 ---
 
-## Time to get some tokens
-Next, we'll use a faucet to mint some test tokens for your own wallet.
+## What Just Happened?
 
-<Card
-  title="Step 3: Mint & Test"
-  icon="flask"
-  href="/tutorial/test"
->
-  Mint test tokens and execute your first swap
+When you run these commands:
+1. Hardhat compiles your Solidity contracts.
+2. The deployment scripts interact with the MidInt RPC.
+3. MidInt wraps these EVM transactions into Bitcoin-compatible intentions.
+4. Your contracts are now live on Bitcoin L1!
+
+<Card title="Part 3: Testing Trading" icon="flask" href="/tutorial/test">
+  Now let's test the DEX functionality with some swaps.
 </Card>

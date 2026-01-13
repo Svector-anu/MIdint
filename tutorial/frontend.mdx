@@ -1,44 +1,94 @@
 ---
-title: 'DEX Interface'
-description: 'Visualize your pools and trades'
-icon: 'browser'
+title: 'Frontend Integration'
+description: 'Connect your web application to MidInt DEX'
+icon: 'code-branch'
 ---
 
-## Visualizing the DEX
+## Building a Bitcoin L1 Interface
 
-While backend scripts are the most reliable way to interact with Bitcoin L1 today, we've provided a React frontend so you can see your data in a clean UI.
+Connecting a frontend to MidInt is very similar to standard EVM development, but with a few specific configurations to handle Bitcoin wallet signing.
 
-### 1. Launch the App
+### 1. Configuration
 
-Navigate to the frontend folder and start the dev server:
+The core configuration for MidInt lives in `frontend/src/config/midl.ts`. We use `wagmi` and `viem` for blockchain interactions.
 
-```bash
-cd frontend
-pnpm install
-pnpm dev
+```typescript
+import { midlRegtest } from '@midl/executor';
+
+export const config = createConfig({
+  chains: [midlRegtest],
+  // ... connectors and providers
+});
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+### 2. Wallet Connection
 
-### 2. Key Pages
+We recommend using `@midl/satoshi-kit` for the smoothest integration with Bitcoin wallets like Xverse and Unisat.
 
-<img src="/docs/screenshots/04_frontend_swap.png" alt="Swap Interface" />
+```tsx
+import { SatoshiKitProvider, ConnectButton } from '@midl/satoshi-kit';
 
-**The Trade Page**
-Shows your current balances and allows you to simulate swaps between TBTC and WBTC.
+function App() {
+  return (
+    <SatoshiKitProvider>
+      <ConnectButton />
+      {/* Your app content */}
+    </SatoshiKitProvider>
+  );
+}
+```
 
-<img src="/docs/screenshots/05_frontend_pools.png" alt="Pools Page" />
+### 3. Reading Data
 
-**The Pools Page**
-Displays active liquidity positions and Top Pools by TVL.
+You can use standard `wagmi` hooks to read data from your DEX contracts.
 
-<img src="/docs/screenshots/06_frontend_liquidity.png" alt="Liquidity Tab" />
+```tsx
+const { data: balance } = useReadContract({
+  address: TBTC_ADDRESS,
+  abi: ERC20_ABI,
+  functionName: 'balanceOf',
+  args: [userAddress],
+});
+```
 
-**Add Liquidity**
-A dedicated interface for approving tokens and providing liquidity to the AMM.
+### 4. Executing Transactions
+
+<Warning>
+**Transaction Signing**: MidInt requires specific metadata for Bitcoin signing. When using `useWriteContract`, ensure the `WagmiMidlProvider` is wrapping your application to correctly intercept and sign intentions.
+</Warning>
+
+```tsx
+const { writeContract } = useWriteContract();
+
+const handleSwap = () => {
+  writeContract({
+    address: ROUTER_ADDRESS,
+    abi: ROUTER_ABI,
+    functionName: 'swapExactTokensForTokens',
+    args: [amountIn, amountOutMin, path, to, deadline],
+  });
+};
+```
+
+### 5. Frontend Screenshots
+
+Here is what the finished UI looks like for the Swap and Pool pages:
+
+<CardGroup cols={2}>
+  <Card title="Swap Interface">
+    <img src="/docs/screenshots/04_frontend_swap.png" alt="Swap UI" />
+  </Card>
+  <Card title="Pools Page">
+    <img src="/docs/screenshots/05_frontend_pools.png" alt="Pools UI" />
+  </Card>
+</CardGroup>
 
 ---
 
-<Note>
-  **Important Note**: The current frontend is optimized for **visualization**. For executing write transactions, we recommend staying with the Hardhat scripts to ensure total reliability with MIDL intentions.
-</Note>
+## Going Further
+
+You've completed the basic tutorial! Check out the advanced section for more complex topics.
+
+<Card title="Advanced Scripting" icon="bolt" href="/advanced/scripts">
+  Learn how to automate complex DEX operations with scripts.
+</Card>

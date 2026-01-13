@@ -1,0 +1,46 @@
+---
+title: 'Testnet Development'
+description: 'Moving from local Regtest to Public Testnet'
+icon: 'vials'
+---
+
+## Transitioning to Public Testnet
+
+While Regtest is great for fast iterations, deploying to the Public Testnet is the final step before Mainnet. This guide covers the differences and requirements.
+
+### 1. Network Configuration
+
+Update your `.env` and `hardhat.config.ts` to include the Testnet RPC.
+
+```bash
+# .env
+RPC_URL="https://rpc.testnet.midl.xyz"
+```
+
+### 2. Obtaining Testnet BTC
+
+On Testnet, you need real Testnet Bitcoin (tBTC) to pay for gas. You can get this from the official MIDL Testnet Faucet:
+
+[https://faucet.testnet.midl.xyz](https://faucet.testnet.midl.xyz)
+
+### 3. Deployment Command
+
+To deploy to Testnet, simply change the network flag:
+
+```bash
+npx hardhat deploy --network midlTestnet
+```
+
+### 4. Public Verification
+
+Transactions on Testnet are visible to everyone. Use the Public Testnet Explorer to verify your deployments:
+
+[https://blockscout.testnet.midl.xyz](https://blockscout.testnet.midl.xyz)
+
+---
+
+## Best Practices for Testnet
+
+- **Gas Management**: Gas fees are more critical on Testnet. Optimize your contract interactions to minimize costs.
+- **Contract Verification**: Always verify your contracts on the public explorer so community members can test your app.
+- **Persistent State**: Unlike Regtest, Testnet state is persistent. Be careful with deployments as you cannot simply "reset" the network.

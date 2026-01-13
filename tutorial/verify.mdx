@@ -1,51 +1,49 @@
 ---
-title: 'Step 4: Verify on Blockscout'
-description: 'See your Bitcoin L1 transactions in real-time'
-icon: 'magnifying-glass'
+title: 'Verifying on Blockscout'
+description: 'How to track and verify your transactions on Bitcoin'
+icon: 'square-check'
 ---
 
-## The Source of Truth
+## Transparency on Bitcoin L1
 
-Because MIDL is EVM-compatible, we can use traditional blockchain explorers like **Blockscout** to see everything happening on Bitcoin L1.
+Every swap, mint, and deployment you perform using MidInt is a verifiable transaction on the Bitcoin network. We use Blockscout to provide a human-readable interface for this data.
 
-### 1. Open Explorer
+### 1. Finding Your Address
 
-Navigate to the Regtest Explorer:
-[blockscout.regtest.midl.xyz](https://blockscout.regtest.midl.xyz)
+After running your tests or deployments, copy your wallet address.
 
-### 2. Search Your Address
+### 2. Using the Explorer
 
-Paste your EVM address into the search bar. You should see:
+Go to the MidInt Regtest Explorer:
+[https://blockscout.regtest.midl.xyz](https://blockscout.regtest.midl.xyz)
 
-<img src="/docs/screenshots/03_blockscout_transactions.png" alt="Blockscout Address View" />
+Paste your address into the search bar.
 
-### 3. Check These Items:
+### 3. Understanding the Data
 
-<CardGroup cols={2}>
-  <Card title="Token Balances" icon="wallet">
-    Verify you have TBTC, WBTC, and LP tokens in your wallet.
-  </Card>
-  <Card title="Transaction History" icon="list">
-    See the "Swap" and "Add Liquidity" transactions confirmed.
-  </Card>
-  <Card title="Contract Source" icon="code">
-    Interact with the Router or Factory directly from the UI.
-  </Card>
-  <Card title="Gas Fees" icon="gas-pump">
-    See the Bitcoin fees used for each operation.
-  </Card>
-</CardGroup>
+In the address view, you can see:
+- **Transaction History**: Every interaction you've had with the MidInt protocol.
+- **Token Balances**: Your current holdings of TBTC, WBTC, and LP tokens.
+- **Contract Internal Calls**: How the Router interacted with the Factory and Pairs.
+
+<img src="/docs/screenshots/03_blockscout_transactions.png" alt="Blockscout Transactions" />
+
+### 4. Verifying Smart Contract Code
+
+To allow others to interact with your contracts safely, you should verify the source code.
+
+```bash
+npx hardhat verify --network default DEPLOYED_CONTRACT_ADDRESS "Constructor Argument 1"
+```
+
+Verified contracts will show a green checkmark check in Blockscout, and the "Contract" tab will display the readable Solidity code and ABI.
 
 ---
 
-## You're a Bitcoin Builder! 🏆
+## Moving to the Frontend
 
-Congratulations on completing the core tutorial. You've successfully launched a DeFi application on the world's most secure network.
+Now that you've mastered the command line, let's look at how to build a user interface for your DEX.
 
-<Card
-  title="Explore Advanced Scripts"
-  icon="code"
-  href="/advanced/scripts"
->
-  Learn how to build more complex Bitcoin intentions
+<Card title="Part 5: Frontend Integration" icon="browser" href="/tutorial/frontend">
+  Learn how to connect your React app to MidInt.
 </Card>

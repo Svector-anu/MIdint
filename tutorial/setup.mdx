@@ -1,74 +1,89 @@
 ---
-title: 'Step 1: Environment Setup'
-description: 'Prepare your workspace for Bitcoin development'
-icon: 'gear'
+title: 'Environment Setup'
+description: 'Prepare your machine for Bitcoin L1 development'
+icon: 'screwdriver-wrench'
 ---
 
-## Let's get your workspace ready!
+## Getting Your Environment Ready
 
-Before we write any code, we need to make sure your machine has the right tools.
+Before you can build on Bitcoin with MidInt, you need to set up your development environment. We'll use modern tools that make smart contract development seamless.
 
-### 1. Install Dependencies
+### Prerequisites
 
-In your terminal, navigate to the `contracts` folder and install the core tools:
+Make sure you have the following installed:
+
+<CardGroup cols={2}>
+  <Card title="Node.js 18+" icon="node-js" href="https://nodejs.org">
+    The runtime for our development tools.
+  </Card>
+  <Card title="pnpm" icon="box-open" href="https://pnpm.io">
+    A fast, disk space efficient package manager.
+  </Card>
+</CardGroup>
+
+### 1. Clone the Starter Kit
+
+Start by cloning the MidInt repository to your local machine.
 
 ```bash
+git clone https://github.com/svector-anu/midint.git
+cd midint
+```
+
+### 2. Install Project Dependencies
+
+The project is split into two main parts: `contracts` and `frontend`. You'll need to install dependencies for both.
+
+<CodeGroup>
+```bash Contracts
 cd contracts
 pnpm install
 ```
 
-### 2. Configure Your Wallet
+```bash Frontend
+cd frontend
+pnpm install
+```
+</CodeGroup>
 
-We need a "Secret Recovery Phrase" (Mnemonic) to sign transactions on the MIDL network.
+### 3. Configure Your Wallet
 
-<Steps>
-  <Step title="Create .env">
-    Copy the example environment file:
-    ```bash
-    cp .env.example .env
-    ```
-  </Step>
-  <Step title="Add Mnemonic">
-    Open `.env` in your editor and add your 12-word phrase:
-    ```bash
-    MNEMONIC="your twelve word secret phrase here"
-    RPC_URL="https://rpc.regtest.midl.xyz"
-    ```
-  </Step>
-</Steps>
+MidInt uses a mnemonic-based wallet system for deployments and testing. You'll need a 12-word recovery phrase (mnemonic).
 
 <Warning>
-  **Security Warning**: This `.env` file contains your private keys. It is included in `.gitignore` so it won't be pushed to GitHub, but always keep it safe!
+**Safety First!** Always use a dedicated test wallet for development. Never use a mnemonic that holds real Bitcoin or significant assets.
 </Warning>
 
-### 3. Check Your Address
-
-MIDL uses a derived EVM address from your Bitcoin wallet. Let's find yours:
+Create a `.env` file in the `contracts` directory:
 
 ```bash
-npx hardhat console --network default
+cd contracts
+cp .env.example .env
 ```
 
-Inside the console, run:
-```javascript
-const [deployer] = await ethers.getSigners();
-console.log("Your EVM Address:", deployer.address);
+Open `.env` and add your mnemonic:
+
+```bash
+MNEMONIC="your twelve word test wallet mnemonic goes here"
+RPC_URL="https://rpc.regtest.midl.xyz"
 ```
 
-<Tip>
-  Save this address! You'll use it to check your balances on the blockchain explorer.
-</Tip>
+### 4. Verify Your Setup
+
+To ensure everything is working correctly, try running the Hardhat help command:
+
+```bash
+npx hardhat help
+```
+
+If you see a list of available tasks, you're ready to go!
 
 ---
 
-## Ready for deployment?
+## Next Steps
 
-Now that your environment is configured, let's deploy the DEX contracts to Bitcoin!
+Now that your environment is ready, let's deploy your first contracts to Bitcoin.
 
-<Card
-  title="Step 2: Deploy Contracts"
-  icon="rocket"
-  href="/tutorial/deploy"
->
-  Deploy your DEX to Bitcoin Layer 1
+<Card title="Part 2: Deployment" icon="rocket" href="/tutorial/deploy">
+  Learn how to deploy tokens and the DEX router to Bitcoin L1.
 </Card>

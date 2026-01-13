@@ -1,53 +1,76 @@
 ---
-title: 'Hardhat Scripts'
-description: 'Mastering the MIDL Intention System'
-icon: 'code'
+title: 'Advanced Scripting'
+description: 'Master complex interactions with MidInt intentions'
+icon: 'scroll'
 ---
 
 ## Beyond Deployment
 
-The real power of this starter kit lies in its scripts. MIDL uses an "Intention" system that allows Bitcoin wallets to sign EVM transactions safely.
+MidInt's unique "intention" execution model allows for powerful scripting that goes beyond simple one-off transactions. By using `hre.midl`, you can chain operations and manage states efficiently.
 
-### The MIDL Workflow
+### 1. The Intention lifecycle
 
-In all our scripts, we follow this pattern:
+In MidInt, transactions are first queued as "intentions" and then executed. This is handled by the `hre.midl` object in Hardhat.
 
 ```javascript
-// 1. Initialize MIDL
+// 1. Initialize the MIDL context
 await hre.midl.initialize();
 
-// 2. Queue an Intention (a contract call)
+// 2. Queue an intention
 await hre.midl.execute({
-    name: "MyContractCall",
+    name: "MyTask",
     address: CONTRACT_ADDRESS,
     functionName: "myFunction",
     args: [arg1, arg2],
 });
 
-// 3. Finalize and broadcast
+// 3. Execute all queued intentions
 await hre.midl.execute();
 ```
 
-### Key Scripts in this Repo
+### 2. Chaining Operations
 
-| Script | Purpose |
-| :--- | :--- |
-| `08_faucet.ts` | Programmatically mint test tokens for your wallet. |
-| `09_test_dex.ts` | Sequential execution of approvals, liquidity, and swaps. |
-| `99_test.ts` | Utility for checking real-time balances and contract states. |
+You can queue multiple intentions and execute them sequentially in a single script. For example, approving and then adding liquidity:
 
-### Running Specific Tasks
+```javascript
+await hre.midl.execute({
+    name: "ApproveTBTC",
+    address: TBTC,
+    functionName: "approve",
+    args: [ROUTER, amount],
+});
 
-You can run individual scripts using tags:
+await hre.midl.execute({
+    name: "AddLiquidity",
+    address: ROUTER,
+    functionName: "addLiquidity",
+    // ... args
+});
 
-```bash
-# Only run the router deployment
-npx hardhat deploy --tags Router --network default
-
-# Only run the faucet
-npx hardhat deploy --tags Faucet --network default
+// Both will be executed in order
+await hre.midl.execute();
 ```
 
-### Custom Interations
+### 3. Reading State with `hre.midl.read`
 
-To create a new interaction, create a file in `contracts/scripts/` and use `hre.midl.execute`. This bypasses the need for frontend signing complexities and gives you direct access to Bitcoin L1 execution.
+While you can use standard `ethers` for reading, `hre.midl.read` provides a consistent interface within the MidInt runtime.
+
+```javascript
+const balance = await hre.midl.read({
+    address: TBTC,
+    functionName: "balanceOf",
+    args: [userAddress],
+});
+```
+
+### 4. Custom Task Examples
+
+You can find advanced script examples in the `contracts/scripts` directory:
+- `faucet.ts`: Selective minting logic.
+- `custom-swap.ts`: Pre-calculated swap paths and slippage.
+
+---
+
+## Technical Deep Dive
+
+To learn more about how MIDL handles intentions at the protocol level, visit the [official MIDL documentation](https://js.midl.xyz).

@@ -1,32 +1,57 @@
 ---
 title: 'Troubleshooting'
-description: 'Common issues and how to fix them'
-icon: 'wrench'
+description: 'Solutions to common issues when building on MidInt'
+icon: 'bug'
 ---
 
-## Common Issues
+## Common Issues and Solutions
 
-### ❌ "No intentions to execute"
-**Cause**: The transactions may have already been executed, or the runtime environment was cleared.
-**Fix**: Ensure you have queued intentions using `hre.midl.execute({...})` before calling the general `hre.midl.execute()` command.
+Building on Bitcoin L1 with EVM compatibility brings some unique challenges. Here are the most common issues developers face and how to fix them.
 
-### ❌ "Insufficient allowance"
-**Cause**: You are trying to add liquidity or swap without approving the Router first.
-**Fix**: Run the `TestDex` script or manually execute an `approve` intention for the token in question.
+### 1. "Insufficient Funds" Error
 
-### ❌ "Out of Gas"
-**Cause**: Your EVM address (0x...) doesn't have enough native BTC to cover gas fees.
-**Fix**: Use the deployer wallet to send a small amount of BTC to your address via `deployer.sendTransaction`.
+**Symptoms:** The transaction fails with an "insufficient funds for gas * price + value" error.
+
+**Cause:** Your wallet address does not have enough native BTC to cover the gas fees for the EVM transaction.
+
+**Solution:** 
+- On **Regtest**: Use the deployer wallet (which is pre-funded) to send BTC to your user address.
+- On **Testnet**: Use the [MIDL Testnet Faucet](https://faucet.testnet.midl.xyz).
+
+### 2. "No intentions to execute"
+
+**Symptoms:** Your script runs but nothing seems to happen, and you see this message in the logs.
+
+**Cause:** You queued intentions using `hre.midl.execute({...})` but forgot to call the final `await hre.midl.execute()`.
+
+**Solution:** Ensure every script that performs writes ends with a call to the execution handler.
+
+### 3. Frontend Transaction Fails (Zeroed Parameters)
+
+**Symptoms:** Transactions from the browser fail with "Missing or invalid parameters" or showing all zeros for `btcTxHash`.
+
+**Cause:** The `WagmiMidlProvider` is either missing from the React tree or misconfigured with the wrong chain object.
+
+**Solution:** 
+- Ensure `WagmiMidlProvider` wraps your `WagmiConfig`.
+- Pass the correct `midlRegtest` or `midlTestnet` chain object from `@midl/executor`.
+
+### 4. "INSUFFICIENT_LIQUIDITY"
+
+**Symptoms:** Swap transactions fail with this Uniswap error.
+
+**Cause:** You are trying to swap for more tokens than the pool currently holds, or the pool has not been seeded with liquidity yet.
+
+**Solution:** 
+- Run the `AddLiquidity` tag: `npx hardhat deploy --tags AddLiquidity --network default`.
+- Check the pool reserves in the frontend or via console.
 
 ---
 
-## Community Support
+## Still Stuck?
 
-<CardGroup cols={2}>
-  <Card title="MIDL Telegram" icon="telegram" href="https://t.me/midl_xyz">
-    Real-time support from the developers.
-  </Card>
-  <Card title="MIDL Discord" icon="discord" href="https://discord.gg/midl">
-    Join the builder community.
-  </Card>
-</CardGroup>
+If your issue isn't listed here, reach out to the community:
+
+- **MIDL Discord**: [Join here](https://discord.gg/midl)
+- **MIDL Telegram**: [t.me/midl_xyz](https://t.me/midl_xyz)
+- **GitHub Issues**: Open a ticket in the repo.
