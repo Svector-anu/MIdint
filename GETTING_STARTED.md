@@ -565,6 +565,5 @@ Happy building! 🛠️
 
 ---
 
-**Made with ❤️ for the Bitcoin community**
 
 *Last updated: January 2026*
