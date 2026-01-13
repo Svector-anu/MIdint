@@ -293,7 +293,7 @@ Bitcoin L1 Execution
 
 - **Issues**: https://github.com/Svector-anu/midint/issues
 - **Discussions**: https://github.com/Svector-anu/midint/discussions
-- **MIDL telegram *: [Join here](t.me/@midl_xyz)
+- **MIDL Telegram**: https://t.me/midl_xyz
 
 ---
 
