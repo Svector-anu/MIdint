@@ -1,282 +1,282 @@
-# 🚀 Bitcoin DEX on MIDL
+# MIDL DEX - Bitcoin Layer 1 Decentralized Exchange
 
-The first Uniswap-style decentralized exchange running on Bitcoin, powered by MIDL Protocol.
+A production-ready DEX built on MIDL (Bitcoin Layer 1 with EVM compatibility) using Uniswap V2 architecture.
 
-![MIDL Logo](./frontend/public/midl-logo.png)
+## 🎯 Project Overview
 
-## 🌟 What is This?
+This project demonstrates how to build and deploy a fully functional decentralized exchange on Bitcoin using MIDL's EVM compatibility layer. All smart contracts are deployed on Bitcoin L1, with transactions secured by Bitcoin's proof-of-work.
 
-This is a **complete starter kit** demonstrating how to build a production-ready DEX on Bitcoin using:
-- **MIDL Protocol** - EVM compatibility on Bitcoin L1
-- **Uniswap V2** - Battle-tested AMM contracts
-- **React + TypeScript** - Modern frontend with beautiful MIDL-branded UI
+### Key Features
 
-## 🏗️ Architecture
-
-```
-Uniswap V2 Contracts (Factory, Pair, Router02)
-              ↓
-      MIDL EVM Layer (Smart Contract Execution)
-              ↓
-      Bitcoin L1 (Settlement & Security)
-```
-
-Every transaction requires:
-1. **EVM Transaction** - Smart contract interaction
-2. **Bitcoin Transaction** - Fees and asset transfers
-3. **MIDL Flow** - Links both via transaction intentions
-
-## 📁 Project Structure
-
-```
-bitcoin-dex/
-├── contracts/              # Smart contracts (Hardhat)
-│   ├── contracts/          # Solidity contracts
-│   │   ├── TestToken.sol          # ERC-20 test tokens
-│   │   ├── WBTC.sol               # Wrapped Bitcoin
-│   │   ├── UniswapV2Factory.sol   # Creates pairs
-│   │   ├── UniswapV2Pair.sol      # Pool logic
-│   │   └── UniswapV2Router02.sol  # User-facing router
-│   ├── deploy/             # Deployment scripts
-│   └── hardhat.config.ts   # MIDL configuration
-│
-└── frontend/               # React UI (Vite)
-    ├── src/
-    │   ├── components/     # React components
-    │   ├── config/         # MIDL & contract config
-    │   ├── hooks/          # Custom React hooks
-    │   └── styles/         # MIDL-branded CSS
-    └── package.json        # Frontend dependencies
-```
+- ✅ **Uniswap V2 DEX** - Complete AMM implementation
+- ✅ **Bitcoin Security** - All transactions on Bitcoin L1
+- ✅ **EVM Compatible** - Use familiar Solidity contracts
+- ✅ **Script-Based** - Reliable Hardhat script execution
+- ✅ **Production Ready** - Tested and documented
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- **Node.js** 18+ and **pnpm** (or npm/yarn)
-- **Bitcoin testnet funds** from [MIDL Faucet](https://faucet.midl.xyz)
-- **Xverse Wallet** (or MIDL-compatible wallet)
+- Node.js 18+
+- pnpm
+- Test Bitcoin wallet (Xverse recommended)
 
-### 1. Install Dependencies
+### Installation
 
 ```bash
-# Install contract dependencies
-cd contracts
-pnpm install
+# Clone repository
+git clone https://github.com/Svector-anu/midint.git
+cd midint
 
-# Install frontend dependencies
-cd ../frontend
-pnpm install
+# Install dependencies
+cd contracts && pnpm install
+cd ../frontend && pnpm install
 ```
 
-### 2. Configure Your Wallet
-
-Set your Bitcoin mnemonic for deployment:
+### Deploy & Test
 
 ```bash
 cd contracts
-npx hardhat vars set MNEMONIC
-# Paste your 12/24 word seed phrase
+
+# Deploy all contracts
+npx hardhat deploy --network default
+
+# Mint test tokens
+npx hardhat deploy --tags Faucet --network default
+
+# Test complete DEX flow
+npx hardhat deploy --tags TestDex --network default
 ```
 
-⚠️ **Security**: Never commit your mnemonic! Use a test wallet only.
+## 📚 Documentation
 
-### 3. Get Your Bitcoin Address
+### Main Tutorials
+
+1. **[SCRIPT_TUTORIAL.md](./SCRIPT_TUTORIAL.md)** ⭐ **RECOMMENDED**
+   - Complete script-based guide
+   - Production-ready approach
+   - All operations via Hardhat scripts
+
+2. **[TUTORIAL.md](./TUTORIAL.md)**
+   - Original full-stack tutorial
+   - Frontend + Backend integration
+   - Comprehensive overview
+
+### Technical Documentation
+
+- **[TESTING.md](./TESTING.md)** - Testing workflows and verification
+- **[FRONTEND_FIX.md](./FRONTEND_FIX.md)** - Frontend implementation details
+- **[SCREENSHOTS.md](./SCREENSHOTS.md)** - Tutorial screenshots guide
+
+## 🏗️ Architecture
+
+### Smart Contracts
+
+```
+contracts/
+├── TestToken.sol       # ERC20 with minting (TBTC)
+├── WBTC.sol           # Wrapped Bitcoin
+├── UniswapV2Factory.sol
+├── UniswapV2Router02.sol
+└── UniswapV2Pair.sol
+```
+
+### Deployment Scripts
+
+```
+deploy/
+├── 00_deploy_tokens.ts    # Deploy TBTC & WBTC
+├── 02_deploy_factory.ts   # Deploy Uniswap Factory
+├── 03_deploy_router.ts    # Deploy Uniswap Router
+├── 04_create_pair.ts      # Create TBTC/WBTC pair
+├── 05_add_liquidity.ts    # Add initial liquidity
+├── 08_faucet.ts          # Mint test tokens
+└── 09_test_dex.ts        # Complete DEX test
+```
+
+### Frontend (Optional)
+
+```
+frontend/
+├── src/
+│   ├── components/     # React components
+│   ├── config/        # MIDL & contract config
+│   └── styles/        # CSS styling
+└── package.json
+```
+
+## 🔧 Usage
+
+### Mint Test Tokens
 
 ```bash
-cd contracts
-pnpm run address
+npx hardhat deploy --tags Faucet --network default
 ```
 
 Output:
 ```
-Bitcoin Address: bcrt1q... (p2wpkh)
-EVM Address: 0x...
+🚰 MIDL Token Faucet
+Minting tokens to: 0xF8483dddbCB103519F8BfE1713aBDa4f3A9C20b0
+🪙 Minting 1,000 TBTC...
+   ✅ 1,000 TBTC minted!
 ```
 
-Fund this address at [https://faucet.regtest.midl.xyz/](https://faucet.regtest.midl.xyz/)
-
-### 4. Deploy Contracts
+### Complete DEX Flow
 
 ```bash
-cd contracts
-pnpm run deploy
+npx hardhat deploy --tags TestDex --network default
 ```
 
-This deploys:
-- ✅ TBTC and TUSDC test tokens
-- ✅ WBTC (Wrapped Bitcoin)
-- ✅ Uniswap V2 Factory
-- ✅ Uniswap V2 Router02
-- ✅ TBTC/TUSDC trading pair
-
-### 5. Update Frontend Config
-
-Copy deployed addresses to `frontend/src/config/contracts.ts`:
-
-```typescript
-export const CONTRACTS = {
-  TBTC: {
-    address: "0x..." // From deployments/default/TBTC.json
-  },
-  // ... update all addresses
-};
+Output:
+```
+🧪 Testing Complete DEX Flow
+✅ Step 1: Approving Router for TBTC...
+✅ Step 2: Approving Router for WBTC...
+💧 Step 3: Adding Liquidity (100 TBTC + 1 WBTC)...
+🔄 Step 4: Swapping 10 TBTC for WBTC...
+✅ DEX Test Complete!
 ```
 
-### 6. Run Frontend
+### Verify on Blockscout
+
+https://blockscout.regtest.midl.xyz/address/YOUR_ADDRESS
+
+## 📊 Contract Addresses (MIDL Regtest)
+
+| Contract | Address |
+|----------|---------|
+| TBTC | `0xA4D2CbAF027125a967E48e94b1Baa03363981b1c` |
+| WBTC | `0xca0daeff9cB8DED3EEF075Df62aDBb1522479639` |
+| Factory | `0xde6c29923d7BB9FDbcDfEC54E7e726894B982593` |
+| Router | `0x29cf3A9B709f94Eb46fBbA67753B90E721ddC9Ed` |
+
+## 🎓 Learning Path
+
+1. **Start Here**: Read [SCRIPT_TUTORIAL.md](./SCRIPT_TUTORIAL.md)
+2. **Deploy Contracts**: Follow the Quick Start guide
+3. **Run Tests**: Execute the Faucet and TestDex scripts
+4. **Verify**: Check transactions on Blockscout
+5. **Customize**: Modify scripts for your use case
+
+## 🛠️ Development
+
+### Run Frontend (Optional)
 
 ```bash
 cd frontend
 pnpm dev
+# Open http://localhost:3000
 ```
 
-Visit **http://localhost:3000** 🎉
+**Note**: Frontend is for visualization only. Use Hardhat scripts for transactions.
 
-## 🎨 Features
+### Custom Scripts
 
-### ✅ Implemented
-
-- **Wallet Connection** - Xverse wallet integration
-- **Swap Interface** - Token swaps with price display
-- **Liquidity Interface** - Add liquidity to pools
-- **Pool Stats** - TVL, volume, reserves
-- **Transaction Flow** - 4-step MIDL process visualization
-- **MIDL Branding** - Orange & white theme
-- **Responsive Design** - Mobile-friendly
-
-### 🔜 Coming Soon (To Do for You!)
-
-- **Real Contract Integration** - Connect hooks to actual swaps
-- **Token Balances** - Read user balances from contracts
-- **Price Oracles** - Real-time price calculations
-- **Remove Liquidity** - Withdraw LP tokens
-- **Multi-hop Routing** - Swap through multiple pairs
-- **Transaction History** - View past transactions
-
-## 🛠️ Development
-
-### Compile Contracts
-
-```bash
-cd contracts
-pnpm compile
-```
-
-### Deploy to Different Networks
-
-Edit `hardhat.config.ts` to add networks:
+Create new scripts in `contracts/scripts/`:
 
 ```typescript
-networks: {
-  mainnet: {
-    url: "https://rpc.midl.xyz",
-    chainId: 888, // Check latest docs
-  }
+import { ethers } from "hardhat";
+
+async function main() {
+    const hre = require("hardhat");
+    await hre.midl.initialize();
+    
+    // Your custom logic here
+    
+    await hre.midl.execute();
 }
+
+main().catch(console.error);
 ```
 
-Then deploy:
+## 🔐 Security
+
+- ✅ Use **TEST WALLETS ONLY** for development
+- ✅ Never commit private keys or mnemonics
+- ✅ Audit contracts before mainnet deployment
+- ✅ Test thoroughly on testnet first
+
+## 🌐 Networks
+
+### MIDL Regtest (Development)
+- RPC: `https://rpc.regtest.midl.xyz`
+- Explorer: `https://blockscout.regtest.midl.xyz`
+
+### MIDL Testnet (Testing)
+- RPC: `https://rpc.testnet.midl.xyz`
+- Explorer: `https://blockscout.testnet.midl.xyz`
+
+### MIDL Mainnet (Production)
+- RPC: `https://rpc.mainnet.midl.xyz`
+- Explorer: `https://blockscout.mainnet.midl.xyz`
+
+## 📝 Environment Variables
+
+Create `contracts/.env`:
 
 ```bash
-pnpm hardhat deploy --network mainnet
+MNEMONIC="your twelve word test wallet mnemonic here"
+RPC_URL="https://rpc.regtest.midl.xyz"
 ```
-
-### Verify Contracts
-
-```bash
-pnpm verify <CONTRACT_ADDRESS> "constructor args" --network default
-```
-
-## 📚 MIDL Transaction Flow
-
-Every write operation (swap, add liquidity) follows this flow:
-
-```
-1. Add Transaction Intention
-   ↓ (Create EVM tx data)
-
-2. Finalize BTC Transaction
-   ↓ (Calculate fees, form Bitcoin tx)
-
-3. Sign Intentions
-   ↓ (Sign with Bitcoin wallet)
-
-4. Broadcast
-   ↓ (Publish to MIDL + Bitcoin)
-
-✅ Confirmed on Bitcoin L1
-```
-
-See `TransactionModal.tsx` for implementation.
-
-## 🎯 Key Technologies
-
-- **Smart Contracts**: Solidity, Uniswap V2, OpenZeppelin
-- **Deployment**: Hardhat, @midl/hardhat-deploy
-- **Frontend**: React, TypeScript, Vite
-- **MIDL SDK**: @midl/executor, @midl/executor-react, @midl/core
-- **Styling**: Custom CSS with CSS variables
-- **State Management**: React Query, Wagmi
-
-## 🔗 Useful Links
-
-- **MIDL Docs**: https://js.midl.xyz/docs
-- **MIDL Faucet**: https://faucet.midl.xyz
-- **Block Explorer**: https://blockscout.regtest.midl.xyz
-- **Uniswap V2 Docs**: https://docs.uniswap.org/contracts/v2/overview
-
-## 🐛 Troubleshooting
-
-### "Module not found: @midl/viem"
-
-Make sure you have the viem override in `package.json`:
-
-```json
-{
-  "pnpm": {
-    "overrides": {
-      "viem": "npm:@midl/viem"
-    }
-  }
-}
-```
-
-### "Insufficient funds"
-
-Get testnet BTC from the faucet:
-```bash
-pnpm address  # Get your address
-# Visit https://faucet.midl.xyz
-```
-
-### "Transaction failed"
-
-Check:
-1. You have enough BTC for fees
-2. Your mnemonic is set correctly
-3. Contracts are deployed on the right network
 
 ## 🤝 Contributing
 
-This is a starter kit! Extend it, improve it, make it yours:
+Contributions welcome! Please:
 
-1. Fork the repo
-2. Add your features
-3. Deploy to MIDL mainnet
-4. Share with the community!
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## 📜 License
+## 📄 License
 
-- **Uniswap V2**: GPL-3.0
-- **This Project**: MIT (for starter kit code)
-- **MIDL**: Check [MIDL Labs](https://midl.xyz) for terms
+MIT License - see [LICENSE](./LICENSE) file
 
-## 🙏 Acknowledgments
+## 🔗 Resources
 
-- **MIDL Labs** - For bringing EVM to Bitcoin
-- **Uniswap** - For the AMM design
-- **OpenZeppelin** - For secure token standards
+- **MIDL Documentation**: https://js.midl.xyz
+- **Hardhat Documentation**: https://hardhat.org
+- **Uniswap V2 Docs**: https://docs.uniswap.org/contracts/v2
+- **GitHub Repository**: https://github.com/Svector-anu/midint
+
+## 💡 Key Insights
+
+### Why Script-Based?
+
+1. **Reliability**: Direct integration with MIDL's intention system
+2. **Simplicity**: No wallet connection complexity
+3. **Production Pattern**: Same approach used in production dApps
+4. **Full Control**: Complete visibility into execution
+
+### MIDL Transaction Flow
+
+```
+Hardhat Script
+    ↓
+hre.midl.execute({...})  // Queue intention
+    ↓
+hre.midl.execute()       // Execute all intentions
+    ↓
+MIDL RPC (wraps in BTC tx)
+    ↓
+Bitcoin L1 Execution
+```
+
+## 🎯 Next Steps
+
+1. ✅ **Customize Scripts** - Modify for your use case
+2. ✅ **Add Features** - Multi-hop swaps, price oracles
+3. ✅ **Deploy to Testnet** - Test with real BTC
+4. ✅ **Build Frontend** - Create read-only UI
+5. ✅ **Audit & Launch** - Security review and mainnet
+
+## 📞 Support
+
+- **Issues**: https://github.com/Svector-anu/midint/issues
+- **Discussions**: https://github.com/Svector-anu/midint/discussions
+- **MIDL Discord**: [Join here](https://discord.gg/midl)
 
 ---
 
-Built with 🧡 on Bitcoin via MIDL Protocol
+**Built with ❤️ on Bitcoin** | **Powered by MIDL**
