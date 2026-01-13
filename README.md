@@ -1,20 +1,38 @@
-# MIDL DEX - Bitcoin Layer 1 Decentralized Exchange
+# 🚀 MIDL DEX Starter Kit
 
-A production-ready DEX built on MIDL (Bitcoin Layer 1 with EVM compatibility) using Uniswap V2 architecture.
+**Build a real DEX on Bitcoin in 20 minutes!**
 
-## 🎯 Project Overview
+This is a complete starter kit for building decentralized exchanges on MIDL - Bitcoin Layer 1 with EVM compatibility. You'll deploy Uniswap V2 contracts, create trading pairs, and execute real swaps on Bitcoin!
 
-This project demonstrates how to build and deploy a fully functional decentralized exchange on Bitcoin using MIDL's EVM compatibility layer. All smart contracts are deployed on Bitcoin L1, with transactions secured by Bitcoin's proof-of-work.
+## ⚡ Quick Start
 
-### Key Features
+**New here? Start with the hands-on tutorial:**
 
-- ✅ **Uniswap V2 DEX** - Complete AMM implementation
-- ✅ **Bitcoin Security** - All transactions on Bitcoin L1
-- ✅ **EVM Compatible** - Use familiar Solidity contracts
-- ✅ **Script-Based** - Reliable Hardhat script execution
-- ✅ **Production Ready** - Tested and documented
+### 👉 **[GETTING_STARTED.md](./GETTING_STARTED.md)** 👈
 
-## 🚀 Quick Start
+This guide walks you through everything step-by-step. No prior Bitcoin or DeFi experience needed!
+
+**What you'll build:**
+- ✅ Your own DEX on Bitcoin (like Uniswap)
+- ✅ Custom tokens (TBTC & WBTC)
+- ✅ Live liquidity pools
+- ✅ Real swaps on Bitcoin L1
+
+**Time needed:** 15-20 minutes
+
+---
+
+## 🎯 What is This?
+
+This starter kit includes:
+
+- ✅ **Uniswap V2 Contracts** - Battle-tested AMM
+- ✅ **Deployment Scripts** - One-command deployment
+- ✅ **Testing Scripts** - Automated DEX testing
+- ✅ **Frontend UI** - React interface (optional)
+- ✅ **Complete Docs** - Step-by-step guides
+
+## 🏃 Super Quick Start
 
 ### Prerequisites
 
