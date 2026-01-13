@@ -1,0 +1,32 @@
+---
+title: 'Troubleshooting'
+description: 'Common issues and how to fix them'
+icon: 'wrench'
+---
+
+## Common Issues
+
+### ❌ "No intentions to execute"
+**Cause**: The transactions may have already been executed, or the runtime environment was cleared.
+**Fix**: Ensure you have queued intentions using `hre.midl.execute({...})` before calling the general `hre.midl.execute()` command.
+
+### ❌ "Insufficient allowance"
+**Cause**: You are trying to add liquidity or swap without approving the Router first.
+**Fix**: Run the `TestDex` script or manually execute an `approve` intention for the token in question.
+
+### ❌ "Out of Gas"
+**Cause**: Your EVM address (0x...) doesn't have enough native BTC to cover gas fees.
+**Fix**: Use the deployer wallet to send a small amount of BTC to your address via `deployer.sendTransaction`.
+
+---
+
+## Community Support
+
+<CardGroup cols={2}>
+  <Card title="MIDL Telegram" icon="telegram" href="https://t.me/midl_xyz">
+    Real-time support from the developers.
+  </Card>
+  <Card title="MIDL Discord" icon="discord" href="https://discord.gg/midl">
+    Join the builder community.
+  </Card>
+</CardGroup>

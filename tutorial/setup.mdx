@@ -1,0 +1,74 @@
+---
+title: 'Step 1: Environment Setup'
+description: 'Prepare your workspace for Bitcoin development'
+icon: 'gear'
+---
+
+## Let's get your workspace ready!
+
+Before we write any code, we need to make sure your machine has the right tools.
+
+### 1. Install Dependencies
+
+In your terminal, navigate to the `contracts` folder and install the core tools:
+
+```bash
+cd contracts
+pnpm install
+```
+
+### 2. Configure Your Wallet
+
+We need a "Secret Recovery Phrase" (Mnemonic) to sign transactions on the MIDL network.
+
+<Steps>
+  <Step title="Create .env">
+    Copy the example environment file:
+    ```bash
+    cp .env.example .env
+    ```
+  </Step>
+  <Step title="Add Mnemonic">
+    Open `.env` in your editor and add your 12-word phrase:
+    ```bash
+    MNEMONIC="your twelve word secret phrase here"
+    RPC_URL="https://rpc.regtest.midl.xyz"
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+  **Security Warning**: This `.env` file contains your private keys. It is included in `.gitignore` so it won't be pushed to GitHub, but always keep it safe!
+</Warning>
+
+### 3. Check Your Address
+
+MIDL uses a derived EVM address from your Bitcoin wallet. Let's find yours:
+
+```bash
+npx hardhat console --network default
+```
+
+Inside the console, run:
+```javascript
+const [deployer] = await ethers.getSigners();
+console.log("Your EVM Address:", deployer.address);
+```
+
+<Tip>
+  Save this address! You'll use it to check your balances on the blockchain explorer.
+</Tip>
+
+---
+
+## Ready for deployment?
+
+Now that your environment is configured, let's deploy the DEX contracts to Bitcoin!
+
+<Card
+  title="Step 2: Deploy Contracts"
+  icon="rocket"
+  href="/tutorial/deploy"
+>
+  Deploy your DEX to Bitcoin Layer 1
+</Card>

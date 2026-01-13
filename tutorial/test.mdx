@@ -1,0 +1,48 @@
+---
+title: 'Step 3: Mint & Trade'
+description: 'Execute your first transactions on Bitcoin'
+icon: 'flask'
+---
+
+## Minting Test Tokens
+
+Before you can trade, you need tokens! We've included a faucet script to make this easy.
+
+### 1. Run the Faucet
+
+Execute the faucet tag to mint 1,000 TBTC to your wallet:
+
+```bash
+npx hardhat deploy --tags Faucet --network default
+```
+
+<img src="/docs/screenshots/01_faucet_output.png" alt="Faucet Terminal Output" />
+
+### 2. Execute the DEX Test
+
+Now, let's run a full automated test that performs approvals, adds liquidity, and does a swap—all in one go.
+
+```bash
+npx hardhat deploy --tags TestDex --network default
+```
+
+<img src="/docs/screenshots/02_testdex_output.png" alt="DEX Test Terminal Output" />
+
+### What did the test do?
+
+1.  **Approved** the Router to spend your TBTC and WBTC.
+2.  **Added** 100 TBTC and 1 WBTC into the liquidity pool.
+3.  **Swapped** 10 TBTC for WBTC to test the pricing math.
+
+---
+
+## Let's see it on-chain
+The final step is verifying that these transactions actually happened on the Bitcoin blockchain.
+
+<Card
+  title="Step 4: Verify Assets"
+  icon="check"
+  href="/tutorial/verify"
+>
+  Check your balances on Blockscout
+</Card>

@@ -1,0 +1,53 @@
+---
+title: 'Hardhat Scripts'
+description: 'Mastering the MIDL Intention System'
+icon: 'code'
+---
+
+## Beyond Deployment
+
+The real power of this starter kit lies in its scripts. MIDL uses an "Intention" system that allows Bitcoin wallets to sign EVM transactions safely.
+
+### The MIDL Workflow
+
+In all our scripts, we follow this pattern:
+
+```javascript
+// 1. Initialize MIDL
+await hre.midl.initialize();
+
+// 2. Queue an Intention (a contract call)
+await hre.midl.execute({
+    name: "MyContractCall",
+    address: CONTRACT_ADDRESS,
+    functionName: "myFunction",
+    args: [arg1, arg2],
+});
+
+// 3. Finalize and broadcast
+await hre.midl.execute();
+```
+
+### Key Scripts in this Repo
+
+| Script | Purpose |
+| :--- | :--- |
+| `08_faucet.ts` | Programmatically mint test tokens for your wallet. |
+| `09_test_dex.ts` | Sequential execution of approvals, liquidity, and swaps. |
+| `99_test.ts` | Utility for checking real-time balances and contract states. |
+
+### Running Specific Tasks
+
+You can run individual scripts using tags:
+
+```bash
+# Only run the router deployment
+npx hardhat deploy --tags Router --network default
+
+# Only run the faucet
+npx hardhat deploy --tags Faucet --network default
+```
+
+### Custom Interations
+
+To create a new interaction, create a file in `contracts/scripts/` and use `hre.midl.execute`. This bypasses the need for frontend signing complexities and gives you direct access to Bitcoin L1 execution.

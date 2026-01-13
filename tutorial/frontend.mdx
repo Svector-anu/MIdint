@@ -1,0 +1,44 @@
+---
+title: 'DEX Interface'
+description: 'Visualize your pools and trades'
+icon: 'browser'
+---
+
+## Visualizing the DEX
+
+While backend scripts are the most reliable way to interact with Bitcoin L1 today, we've provided a React frontend so you can see your data in a clean UI.
+
+### 1. Launch the App
+
+Navigate to the frontend folder and start the dev server:
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 2. Key Pages
+
+<img src="/docs/screenshots/04_frontend_swap.png" alt="Swap Interface" />
+
+**The Trade Page**
+Shows your current balances and allows you to simulate swaps between TBTC and WBTC.
+
+<img src="/docs/screenshots/05_frontend_pools.png" alt="Pools Page" />
+
+**The Pools Page**
+Displays active liquidity positions and Top Pools by TVL.
+
+<img src="/docs/screenshots/06_frontend_liquidity.png" alt="Liquidity Tab" />
+
+**Add Liquidity**
+A dedicated interface for approving tokens and providing liquidity to the AMM.
+
+---
+
+<Note>
+  **Important Note**: The current frontend is optimized for **visualization**. For executing write transactions, we recommend staying with the Hardhat scripts to ensure total reliability with MIDL intentions.
+</Note>
