@@ -1,0 +1,101 @@
+{
+    "$schema": "https://mintlify.com/schema.json",
+    "name": "MIDL DEX Starter Kit",
+    "logo": {
+        "dark": "/logo/dark.svg",
+        "light": "/logo/light.svg"
+    },
+    "favicon": "/favicon.svg",
+    "colors": {
+        "primary": "#FF6B35",
+        "light": "#FF8C61",
+        "dark": "#E85A2B",
+        "anchors": {
+            "from": "#FF6B35",
+            "to": "#E85A2B"
+        }
+    },
+    "topbarLinks": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/Svector-anu/midint"
+        }
+    ],
+    "topbarCtaButton": {
+        "name": "Get Started",
+        "url": "https://github.com/Svector-anu/midint"
+    },
+    "tabs": [
+        {
+            "name": "Tutorial",
+            "url": "tutorial"
+        },
+        {
+            "name": "Reference",
+            "url": "reference"
+        }
+    ],
+    "anchors": [
+        {
+            "name": "GitHub",
+            "icon": "github",
+            "url": "https://github.com/Svector-anu/midint"
+        },
+        {
+            "name": "Telegram",
+            "icon": "telegram",
+            "url": "https://t.me/midl_xyz"
+        },
+        {
+            "name": "MIDL Docs",
+            "icon": "book",
+            "url": "https://js.midl.xyz"
+        }
+    ],
+    "navigation": [
+        {
+            "group": "Get Started",
+            "pages": [
+                "introduction",
+                "quickstart"
+            ]
+        },
+        {
+            "group": "Tutorial",
+            "pages": [
+                "tutorial/overview",
+                "tutorial/setup",
+                "tutorial/deploy",
+                "tutorial/test",
+                "tutorial/verify",
+                "tutorial/frontend"
+            ]
+        },
+        {
+            "group": "Advanced",
+            "pages": [
+                "advanced/scripts",
+                "advanced/custom-tokens",
+                "advanced/testnet",
+                "advanced/troubleshooting"
+            ]
+        },
+        {
+            "group": "Reference",
+            "pages": [
+                "reference/contracts",
+                "reference/networks",
+                "reference/screenshots"
+            ]
+        }
+    ],
+    "footerSocials": {
+        "github": "https://github.com/Svector-anu/midint",
+        "telegram": "https://t.me/midl_xyz"
+    },
+    "feedback": {
+        "thumbsRating": true,
+        "suggestEdit": true,
+        "raiseIssue": true
+    }
+}

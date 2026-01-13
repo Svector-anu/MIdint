@@ -1,0 +1,142 @@
+---
+title: 'Quickstart'
+description: 'Deploy your DEX on Bitcoin in 5 commands'
+icon: 'rocket'
+---
+
+## Get Your DEX Running
+
+Follow these steps to deploy a complete DEX on Bitcoin in under 20 minutes.
+
+<Steps>
+  <Step title="Clone the Repository">
+    ```bash
+    git clone https://github.com/Svector-anu/midint.git
+    cd midint/contracts
+    pnpm install
+    ```
+  </Step>
+
+  <Step title="Configure Your Wallet">
+    Create `.env` file:
+    ```bash
+    cp .env.example .env
+    ```
+    
+    Add your test wallet mnemonic:
+    ```bash
+    MNEMONIC="your twelve word test mnemonic here"
+    RPC_URL="https://rpc.regtest.midl.xyz"
+    ```
+    
+    <Warning>
+      **Use a TEST wallet only!** Never use your real Bitcoin wallet for development.
+    </Warning>
+  </Step>
+
+  <Step title="Deploy All Contracts">
+    ```bash
+    npx hardhat deploy --network default
+    ```
+    
+    This deploys:
+    - ✅ TBTC & WBTC tokens
+    - ✅ Uniswap V2 Factory
+    - ✅ Uniswap V2 Router
+    - ✅ TBTC/WBTC trading pair
+    - ✅ Initial liquidity
+  </Step>
+
+  <Step title="Mint Test Tokens">
+    ```bash
+    npx hardhat deploy --tags Faucet --network default
+    ```
+    
+    Output:
+    ```
+    🚰 MIDL Token Faucet
+    🪙 Minting 1,000 TBTC...
+       ✅ 1,000 TBTC minted!
+    ```
+  </Step>
+
+  <Step title="Test Your DEX">
+    ```bash
+    npx hardhat deploy --tags TestDex --network default
+    ```
+    
+    This will:
+    - ✅ Approve tokens
+    - ✅ Add liquidity (100 TBTC + 1 WBTC)
+    - ✅ Swap 10 TBTC for WBTC
+  </Step>
+</Steps>
+
+## Verify on Blockscout
+
+Check your transactions on the blockchain explorer:
+
+```
+https://blockscout.regtest.midl.xyz/address/YOUR_ADDRESS
+```
+
+<img src="/docs/screenshots/03_blockscout_transactions.png" alt="Blockscout" />
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card
+    title="Full Tutorial"
+    icon="book-open"
+    href="/tutorial/overview"
+  >
+    Detailed step-by-step guide with explanations
+  </Card>
+  <Card
+    title="Advanced Scripts"
+    icon="code"
+    href="/advanced/scripts"
+  >
+    Custom swaps, liquidity management, and more
+  </Card>
+  <Card
+    title="Deploy to Testnet"
+    icon="cloud"
+    href="/advanced/testnet"
+  >
+    Take your DEX to MIDL Testnet
+  </Card>
+  <Card
+    title="Troubleshooting"
+    icon="wrench"
+    href="/advanced/troubleshooting"
+  >
+    Common issues and solutions
+  </Card>
+</CardGroup>
+
+## Need Help?
+
+<CardGroup cols={3}>
+  <Card
+    title="GitHub Issues"
+    icon="github"
+    href="https://github.com/Svector-anu/midint/issues"
+  >
+    Report bugs or request features
+  </Card>
+  <Card
+    title="Telegram"
+    icon="telegram"
+    href="https://t.me/midl_xyz"
+  >
+    Join the MIDL community
+  </Card>
+  <Card
+    title="MIDL Docs"
+    icon="book"
+    href="https://js.midl.xyz"
+  >
+    Official MIDL documentation
+  </Card>
+</CardGroup>

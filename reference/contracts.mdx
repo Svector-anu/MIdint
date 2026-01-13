@@ -1,0 +1,183 @@
+---
+title: 'Contract Addresses'
+description: 'Deployed contract addresses on MIDL networks'
+icon: 'database'
+---
+
+## MIDL Regtest (Development)
+
+Use these addresses for local development and testing.
+
+### Core Contracts
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **TBTC** | `0xA4D2CbAF027125a967E48e94b1Baa03363981b1c` | Test Bitcoin Token (8 decimals) |
+| **WBTC** | `0xca0daeff9cB8DED3EEF075Df62aDBb1522479639` | Wrapped Bitcoin (18 decimals) |
+| **Factory** | `0xde6c29923d7BB9FDbcDfEC54E7e726894B982593` | Uniswap V2 Factory |
+| **Router** | `0x29cf3A9B709f94Eb46fBbA67753B90E721ddC9Ed` | Uniswap V2 Router02 |
+
+### Verify on Blockscout
+
+```
+https://blockscout.regtest.midl.xyz/address/CONTRACT_ADDRESS
+```
+
+## Networks
+
+### Regtest (Development)
+
+<CodeGroup>
+```javascript Hardhat
+{
+  url: "https://rpc.regtest.midl.xyz",
+  chainId: 18332,
+  accounts: { mnemonic: process.env.MNEMONIC }
+}
+```
+
+```javascript Wagmi
+{
+  id: 18332,
+  name: 'MIDL Regtest',
+  network: 'midl-regtest',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Bitcoin',
+    symbol: 'BTC',
+  },
+  rpcUrls: {
+    default: { http: ['https://rpc.regtest.midl.xyz'] },
+  },
+  blockExplorers: {
+    default: { 
+      name: 'Blockscout', 
+      url: 'https://blockscout.regtest.midl.xyz' 
+    },
+  },
+}
+```
+</CodeGroup>
+
+### Testnet (Testing)
+
+<CodeGroup>
+```javascript Hardhat
+{
+  url: "https://rpc.testnet.midl.xyz",
+  chainId: 18333,
+  accounts: { mnemonic: process.env.MNEMONIC }
+}
+```
+
+```javascript Wagmi
+{
+  id: 18333,
+  name: 'MIDL Testnet',
+  network: 'midl-testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Bitcoin',
+    symbol: 'BTC',
+  },
+  rpcUrls: {
+    default: { http: ['https://rpc.testnet.midl.xyz'] },
+  },
+  blockExplorers: {
+    default: { 
+      name: 'Blockscout', 
+      url: 'https://blockscout.testnet.midl.xyz' 
+    },
+  },
+}
+```
+</CodeGroup>
+
+### Mainnet (Production)
+
+<CodeGroup>
+```javascript Hardhat
+{
+  url: "https://rpc.mainnet.midl.xyz",
+  chainId: 18334,
+  accounts: { mnemonic: process.env.MNEMONIC }
+}
+```
+
+```javascript Wagmi
+{
+  id: 18334,
+  name: 'MIDL Mainnet',
+  network: 'midl-mainnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Bitcoin',
+    symbol: 'BTC',
+  },
+  rpcUrls: {
+    default: { http: ['https://rpc.mainnet.midl.xyz'] },
+  },
+  blockExplorers: {
+    default: { 
+      name: 'Blockscout', 
+      url: 'https://blockscout.mainnet.midl.xyz' 
+    },
+  },
+}
+```
+</CodeGroup>
+
+## ABIs
+
+### ERC20 Token
+
+<Accordion title="View ABI">
+```json
+[
+  {
+    "inputs": [
+      {"name": "to", "type": "address"},
+      {"name": "amount", "type": "uint256"}
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"name": "spender", "type": "address"},
+      {"name": "amount", "type": "uint256"}
+    ],
+    "name": "approve",
+    "outputs": [{"name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"name": "account", "type": "address"}
+    ],
+    "name": "balanceOf",
+    "outputs": [{"name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+```
+</Accordion>
+
+### Uniswap V2 Router
+
+<Accordion title="View ABI">
+See full ABI in `frontend/src/config/contracts.ts`
+</Accordion>
+
+## Gas Fees
+
+<Note>
+  Gas fees on MIDL are paid in BTC. Typical costs:
+  - Token mint: ~0.0001 BTC
+  - Swap: ~0.0002 BTC
+  - Add liquidity: ~0.0003 BTC
+</Note>
