@@ -1,39 +1,78 @@
 import { useState } from "react";
 import { useAccounts } from "@midl/react";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { parseUnits } from "ethers";
 import { CONTRACTS, ERC20_ABI } from "../config/contracts";
 import { FaFaucet } from "react-icons/fa";
 
 export default function TokenFaucet() {
     const { accounts } = useAccounts();
-    const userAddress = accounts?.[0]?.address as `0x${string}` | undefined;
-    const [minting, setMinting] = useState<string | null>(null);
 
-    const { writeContract, data: hash } = useWriteContract();
-    const { isSuccess } = useWaitForTransactionReceipt({ hash });
+    // Use wagmi's useAccount which is patched by WagmiMidlProvider
+    const { address: wagmiAddress, isConnected: wagmiConnected } = useAccount();
+
+    console.log("MIDL accounts:", accounts);
+    console.log("Wagmi address (derived EVM):", wagmiAddress);
+    console.log("Wagmi connected:", wagmiConnected);
+
+    // Use the wagmi-derived EVM address
+    const userAddress = wagmiAddress;
+
+    const [minting, setMinting] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
+    const { isSuccess, isLoading: isConfirming } = useWaitForTransactionReceipt({ hash });
+
+    // Log errors
+    if (writeError) {
+        console.error("Write contract error:", writeError);
+    }
 
     const mintTokens = async (tokenSymbol: 'TBTC' | 'WBTC') => {
-        if (!userAddress) return;
+        if (!userAddress) {
+            console.log("No EVM address from wagmi");
+            setError("Wallet not properly connected. Try disconnecting and reconnecting.");
+            return;
+        }
 
         setMinting(tokenSymbol);
+        setError(null);
+
+        console.log(`Minting ${tokenSymbol} for ${userAddress}...`);
 
         try {
             const token = CONTRACTS[tokenSymbol];
-            const amount = tokenSymbol === 'WBTC'
-                ? parseUnits("10", 18)  // 10 WBTC
-                : parseUnits("1000", 8);  // 1000 TBTC
 
-            // For TBTC, call mint (it's a TestToken)
+            // For TBTC, call mint (it's a TestToken with public mint)
             if (tokenSymbol === 'TBTC') {
+                const amount = parseUnits("1000", 8); // 1000 TBTC
+                console.log(`Token address: ${token.address}`);
+                console.log(`Amount: ${amount.toString()}`);
+                console.log("Calling mint...");
+
                 writeContract({
                     address: token.address,
                     abi: ERC20_ABI,
                     functionName: "mint",
                     args: [userAddress, amount],
+                }, {
+                    onSuccess: (data) => {
+                        console.log("Mint tx submitted:", data);
+                    },
+                    onError: (err) => {
+                        console.error("Mint failed:", err);
+                        setError(err.message);
+                        setMinting(null);
+                    },
                 });
             } else {
-                // For WBTC, deposit native BTC (send value)
+                // For WBTC, deposit requires native BTC
+                const amount = parseUnits("1", 18); // 1 WBTC
+                console.log(`Token address: ${token.address}`);
+                console.log(`Amount: ${amount.toString()}`);
+                console.log("Calling deposit...");
+
                 writeContract({
                     address: token.address,
                     abi: [{
@@ -45,10 +84,20 @@ export default function TokenFaucet() {
                     }],
                     functionName: "deposit",
                     value: amount,
+                }, {
+                    onSuccess: (data) => {
+                        console.log("Deposit tx submitted:", data);
+                    },
+                    onError: (err) => {
+                        console.error("Deposit failed:", err);
+                        setError(err.message);
+                        setMinting(null);
+                    },
                 });
             }
-        } catch (error) {
-            console.error("Mint error:", error);
+        } catch (err: any) {
+            console.error("Mint error:", err);
+            setError(err.message || "Unknown error");
             setMinting(null);
         }
     };
@@ -57,7 +106,10 @@ export default function TokenFaucet() {
         setTimeout(() => setMinting(null), 2000);
     }
 
-    if (!userAddress) {
+    // Check if connected via MIDL accounts
+    const hasMidlAccounts = accounts && accounts.length > 0;
+
+    if (!hasMidlAccounts) {
         return (
             <div style={{
                 padding: "1rem",
@@ -96,26 +148,54 @@ export default function TokenFaucet() {
                 </div>
             </div>
 
+            {/* Show connected addresses */}
+            <div style={{
+                fontSize: "0.7rem",
+                color: "var(--text-tertiary)",
+                marginBottom: "1rem",
+                wordBreak: "break-all",
+            }}>
+                <div>BTC: {accounts?.[0]?.address}</div>
+                <div>EVM: {userAddress || "Not derived yet"}</div>
+            </div>
+
             <div style={{ display: "flex", gap: "0.75rem" }}>
                 <button
                     onClick={() => mintTokens('TBTC')}
-                    disabled={minting === 'TBTC'}
+                    disabled={isPending || isConfirming || !userAddress}
                     className="btn btn-secondary"
                     style={{ flex: 1 }}
                 >
-                    {minting === 'TBTC' ? '⏳' : 'Get 1,000 TBTC'}
+                    {isPending && minting === 'TBTC' ? '⏳ Signing...' : isConfirming && minting === 'TBTC' ? '⏳ Confirming...' : 'Get 1,000 TBTC'}
                 </button>
 
                 <button
                     onClick={() => mintTokens('WBTC')}
-                    disabled={minting === 'WBTC'}
+                    disabled={isPending || isConfirming || !userAddress}
                     className="btn btn-secondary"
                     style={{ flex: 1 }}
                 >
-                    {minting === 'WBTC' ? '⏳' : 'Get 10 WBTC'}
+                    {isPending && minting === 'WBTC' ? '⏳ Signing...' : isConfirming && minting === 'WBTC' ? '⏳ Confirming...' : 'Get 1 WBTC'}
                 </button>
             </div>
 
+            {/* Error Display */}
+            {(error || writeError) && (
+                <div style={{
+                    marginTop: "1rem",
+                    padding: "0.75rem",
+                    background: "rgba(239, 68, 68, 0.1)",
+                    borderRadius: "var(--radius-md)",
+                    color: "#ef4444",
+                    fontSize: "0.75rem",
+                    textAlign: "center",
+                    wordBreak: "break-word",
+                }}>
+                    ❌ {error || writeError?.message?.slice(0, 200)}
+                </div>
+            )}
+
+            {/* Success Display */}
             {isSuccess && (
                 <div style={{
                     marginTop: "1rem",
@@ -127,6 +207,19 @@ export default function TokenFaucet() {
                     textAlign: "center",
                 }}>
                     ✅ Tokens minted successfully!
+                </div>
+            )}
+
+            {/* Hash Display */}
+            {hash && (
+                <div style={{
+                    marginTop: "0.5rem",
+                    fontSize: "0.75rem",
+                    color: "var(--text-tertiary)",
+                    textAlign: "center",
+                    wordBreak: "break-all",
+                }}>
+                    Tx: {hash}
                 </div>
             )}
         </div>

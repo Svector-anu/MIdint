@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaPlus, FaArrowRight } from "react-icons/fa";
 import { useAccounts, useConnect } from "@midl/react";
 import { AddressPurpose } from "@midl/core";
-import { useReadContract, useReadContracts } from "wagmi";
+import { useReadContract } from "wagmi";
 import { CONTRACTS, FACTORY_ABI, PAIR_ABI } from "../config/contracts";
 import { formatUnits } from "ethers";
 
