@@ -1,58 +1,23 @@
-import { createConfig, regtest } from "@midl/core";
+import { createMidlConfig } from "@midl/satoshi-kit";
+import { regtest } from "@midl/core";
 import { xverseConnector } from "@midl/connectors";
-import { http, createConfig as createWagmiConfig } from "wagmi";
-import { defineChain } from "viem";
+import type { Config } from "@midl/core";
 
 /**
- * MIDL Configuration
- * Sets up connection to MIDL Regtest and wallet connectors
+ * MIDL Configuration using SatoshiKit
+ * This automatically sets up wallet connectors
  */
-export const midlConfig = createConfig({
+export const midlConfig = createMidlConfig({
     networks: [regtest],
-    connectors: [xverseConnector()],
     persist: true,
-});
-
-/**
- * MIDL Regtest RPC URL
- */
-const MIDL_RPC_URL = "https://rpc.regtest.midl.xyz";
-
-/**
- * MIDL Regtest as a Viem/Wagmi chain
- */
-export const midlRegtest = defineChain({
-    id: 18332, // Bitcoin regtest chain ID
-    name: "MIDL Regtest",
-    nativeCurrency: {
-        name: "Bitcoin",
-        symbol: "BTC",
-        decimals: 8,
-    },
-    rpcUrls: {
-        default: {
-            http: [MIDL_RPC_URL],
-        },
-    },
-    blockExplorers: {
-        default: {
-            name: "Blockscout",
-            url: "https://blockscout.regtest.midl.xyz",
-        },
-    },
-    testnet: true,
-});
-
-/**
- * Wagmi Configuration for MIDL
- * This is used by WagmiMidlProvider to enable EVM operations
- */
-export const wagmiConfig = createWagmiConfig({
-    chains: [midlRegtest],
-    transports: {
-        [midlRegtest.id]: http(MIDL_RPC_URL),
-    },
-});
+    connectors: [
+        xverseConnector({
+            metadata: {
+                group: "popular",
+            },
+        }),
+    ],
+}) as Config;
 
 /**
  * MIDL Network Details

@@ -1,6 +1,4 @@
-import { useAccounts, useConnect, useDisconnect } from "@midl/react";
-import { AddressPurpose } from "@midl/core";
-import { FaWallet } from "react-icons/fa";
+import { ConnectButton } from "@midl/satoshi-kit";
 
 interface HeaderProps {
     activePage: "trade" | "pools";
@@ -8,25 +6,6 @@ interface HeaderProps {
 }
 
 export default function Header({ activePage, onPageChange }: HeaderProps) {
-    const { isConnected, accounts } = useAccounts();
-    const { disconnect } = useDisconnect();
-    const { connectors, connect, error, isPending } = useConnect({
-        purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
-    });
-
-    console.log("Wallet state:", { isConnected, accounts, connectors, error, isPending });
-
-    const truncateAddress = (address: string | undefined) => {
-        if (!address) return "";
-        return `${address.slice(0, 6)}...${address.slice(-4)}`;
-    };
-
-    const handleConnect = () => {
-        if (connectors && connectors.length > 0) {
-            connect({ id: connectors[0].id });
-        }
-    };
-
     return (
         <header className="header">
             <div className="container header-content">
@@ -67,29 +46,8 @@ export default function Header({ activePage, onPageChange }: HeaderProps) {
                     </nav>
                 </div>
 
-                <nav className="nav">
-                    {isConnected && accounts && accounts[0] ? (
-                        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                            <div style={{
-                                padding: "0.5rem 1rem",
-                                background: "var(--gray-100)",
-                                borderRadius: "var(--radius-full)",
-                                fontSize: "0.875rem",
-                                fontWeight: "600"
-                            }}>
-                                {truncateAddress(accounts[0].address)}
-                            </div>
-                            <button onClick={() => disconnect()} className="btn btn-secondary btn-sm">
-                                Disconnect
-                            </button>
-                        </div>
-                    ) : (
-                        <button onClick={handleConnect} className="btn btn-primary">
-                            <FaWallet />
-                            Connect Wallet
-                        </button>
-                    )}
-                </nav>
+                {/* SatoshiKit Connect Button */}
+                <ConnectButton />
             </div>
         </header>
     );
