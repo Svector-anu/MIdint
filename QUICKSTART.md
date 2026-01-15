@@ -74,4 +74,3 @@ Open **http://localhost:3000** 🎉
 
 ---
 
-**Built with 🧡 on Bitcoin**
