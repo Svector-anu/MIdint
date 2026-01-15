@@ -1,4 +1,4 @@
-# 🚀 Quick Start - Bitcoin DEX on MIDL
+#  Quick Start - Bitcoin DEX on MIDL
 
 Get your DEX running in 5 minutes!
 
